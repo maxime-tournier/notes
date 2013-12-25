@@ -1,0 +1,75 @@
+Special Linear Group
+
+Some notes on the (3-dimensional) special linear group (especially for
+computing exponential/logarithm)
+
+#+include: ~/org/latex.org
+#+setupfile: ~/org/style.org
+
+* Definition
+
+  This is the subgroup of invertible matrices with unit determinant:
+
+  \[ SL_n(\RR) = { g \in GL_n(\RR), \quad \det(g) = 1} \]
+  
+
+* Polar Decomposition
+  
+  Any invertible matrix $g \in GL_n(\RR)$ can be /uniquely/ decomposed
+  as:
+  
+  \[ g = q p, \quad q \in SO_n(\RR), \quad p \in \Sym^{++}_n(\RR) \]
+  
+  Thus, any unit determinant matrix can be expressed as above with:
+
+  \[ g = q p, \quad \det(p) = 1 \]
+  
+** Eigen decomposition of $p$
+
+   $p$ being real positive definite, it can itself be uniquely
+   decomposed as:
+
+   \[ p = u \lambda \inv{u}, \quad u \in SO_n(\RR) \]
+   
+   where $\lambda$ is diagonal with unit determinant, /i.e/ $\prod
+   \lambda_i = 1$.
+
+   Finally, merging $q$ and $u$, we see that any $g \in SL_n(\RR)$ can
+   be decomposed as:
+
+   \[ g = u \lambda \inv{v}, \quad u, v \in SO_n(\RR), \quad det(\lambda) = 1 \]
+
+   
+* Lie Group 
+
+  We use the above decomposition to compute the exponential and
+  logarithm in $SL_n(\RR)$. For this we use the SLERP interpolation of
+  $u$ and $v$, where the logarithm/exponential are easy[1] to compute:
+
+  \[ k = u.\exp\block{0.5 \block{ \log \block{\inv{u} v }}} \]
+  
+  Noting that:
+
+  \[ k = v \exp\block{0.5 \block{ \log \block{\inv{v} u }}} \]
+
+  It is easy to verify that:
+  
+  \[ \block{ \inv{k} u } \block{ \inv{k} v } = 1 \quad (1) \]
+  
+  The idea now is to work on $\inv{k} g k$ on which the logarithm is
+  easily computed as we show below.
+  
+** Eigendecomposition 
+
+   Let us express $h = \inv{k} g k$:
+
+   \begin{align}
+   h &= \inv{k} g k \\
+     &= \inv{k} u \lambda \inv{v} k \\
+     &= \block{\inv{k} u} \lambda \inv{ \block{ \inv{k} v }} \\
+     AAARGH
+
+     \end{align}
+
+
+[1] in the 3-dimensional case, at least

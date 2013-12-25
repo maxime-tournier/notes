@@ -1,0 +1,171 @@
+Differential Geometry
+
+#+setupfile: ~/org/style.org
+#+include: ~/org/latex.org
+
+* TODO Manifolds
+  Charts, Atlases...
+  
+  Important: we only define things through charts, we will only know
+  them by charts.
+   
+* TODO Tangent Space
+  
+  How to define a tangent vector if there is no space /surrounding/
+  the manifold? In the Euclidean case, tangent space at one point is
+  defined by the set of all possible tangents to curves at this
+  point. We can actually transport this definition to a manifold using
+  charts: given one chart around one point, we identify *all the
+  curves having a common tangent vector, at this point, in coordinates* [fn:germs].
+
+  This quotient set actually /defines/ a tangent vector at some point
+  of the manifold. We have to verify that this definition is
+  coordinate-invariant, that is two different charts need to produce
+  the same tangent vectors, which is hopefully the case[fn:changemap].
+
+  So what /is/ a tangent vector? It is the set of all curves sharing
+  their tangent in coordinates, at this point. This set is
+  chart-invariant, and so are tangent vectors. The tangent space at
+  one point is the set of all tangent vectors at this point, which is
+  a vector space of the same dimension as the manifold. It is noted
+  $T_xM$ for $x \in M$.
+  
+** Notations
+  
+  By analogy with the vector case, we will denote by $\dd x(0)$ the
+  tangent vector to the curve $x$ at 0. We will often use abusive
+  notations, omitting curve parameters when the context is clear,
+  /e.g./ usually, we'll only denote by $\dd x \in T_xM$ some tangent
+  vector at $x \in M$.
+
+* Tangent maps
+  
+  If we consider smooth maps between manifolds, they have a linear
+  differential in coordinates, also known as the *Fréchet* derivative:
+
+  \[ f( x + h ) = f(x) + \dd f(x).h + o\big(||h||\big) \]
+
+  By composing curves, charts, and function in coordinates, we can
+  build the /tangent map/ of the function at some point of the
+  manifold, that linearly maps tangent vectors between tangent spaces,
+  and whose expression in coordinates is the classical Fréchet
+  derivative.
+  
+  Given a function $f: M \rightarrow N$, the tangent map of $f$ at $x
+  \in M$ linearly maps tangent spaces:
+
+  \[ \dd f(x) : T_x M \rightarrow T_{f(x)}N \]
+
+  Using a curve $x$ and the above curve derivation operator, its
+  (remarkably compact) definition directly follows from the chain
+  rule:
+
+  \[ \dd f(x(0)).\dd x = \dd (f\circ x)(0) \]
+  
+  In a nutshell, smooth maps between manifolds induce linear, tangent
+  maps between tangent spaces.
+
+
+* TODO Tangent Bundles
+
+  Vector bundles, moebius strip, parallelizable manifolds
+
+* TODO Covariant Derivative
+  
+  Derivating a vector field along one direction at a point raises a
+  problem: how to /compare/ nearby tangent vectors ? The manifold may
+  be curved, so one need a local /frame change/ formula in order to
+  /connect/ nearby tangent spaces.
+
+
+
+we need to know how to /connect/ nearby tangent spaces in
+  order to compare tangent vector at nearby points. That is: we need a
+  local change of frame formula 
+  
+  
+in the general case, a manifold is curved, meaning their
+  tangent spaces are locally related by a linear /change of frame/
+  transformation. In the case of Lie groups, tangent spaces are
+  globally isomorphic through the adjoint map.
+
+
+[fn:germs] A /dual/ definition is often given using scalar fields. If
+we consider the derivation along a vector in the Euclidean case, this
+vector has to be in the tangent space of the field at this point for
+the definition to make sense (think of altitude on a mountain)
+
+[fn:changemap] This can be checked by composing charts in a clever
+fashion.
+
+
+* Cheat Sheet
+  
+** Composition
+   \[ \dd (f \circ g)(x).\dd x = \dd f(g(x)).\dd g(x).\dd x \]
+   
+** Linear Map
+   
+   \[ \dd Ax.\dd x = A.\dd x \]
+   
+** Bilinear Map (Product, Inner Product, ... )
+   
+   \[ \dd M(x, y).(\dd x, \dd y) = M(\dd x, y) + M(x, \dd y) \]
+   
+   
+** Square Norm
+   \[ \dd ||x||_M^2.\dd x = 2x^T M.\dd x \]
+   
+** Square Root
+   \[ \dd \sqrt x.dx = \dd x^\frac{1}{2}.\dd x = \frac{1}{2} x^{-\frac{1}{2}}.\dd x = \frac{1}{2\sqrt{x}}.\dd x\]
+   
+** Norm 
+   
+   \[ \dd ||x||_M.\dd x = \frac{x^T}{||x||_M} M.\dd x \]
+   
+** Inverse (Real)
+   
+   \[ \dd \frac{1}{x}. \dd x = \dd x^{-1}.\dd x = -1.x^{-2}.\dd x = -\frac{\dd x}{x^2} \]
+   
+** Normalization
+
+   This one is useful when deriving [[file:quaternions.org][quaternion]] exponential:
+
+   \begin{align*}
+   \dd \frac{x}{||x||_M}.\dd x &= \frac{\dd x}{||x||_M} + x \dd \frac{1}{||x||_M}.\dd x \\
+   &=   \frac{\dd x}{||x||_M} - x\frac{\dd ||x||_M.\dd x}{||x||_M^2} \\
+   &=   \frac{\dd x}{||x||_M} - x\frac{ x^T } {||x||_M^3} M.\dd x \\
+   &=   \frac{1}{||x||_M}\left( \dd x - x\frac{ x^T  M.\dd x} {||x||_M^2} \right) \\
+   &=    \frac{1}{||x||_M} (I - \pi_x^M).\dd x \\ 
+   \end{align*}
+   
+   The term on the very right, last line, is the $M$-orthogonal
+   projection of $\dd x$ over $Span(x)$.
+   
+** Orthogonal Projection
+
+   In matrix form, we can write the $M$-orthogonal projection over
+   $Span(x)$ as:
+
+   \[ \pi_x = \frac{x.x^TM}{||x||_M^2} = \frac{x}{||x||_M} \frac{x^T}{||x||_M}.M \]
+
+   Its differential is thus given by:
+
+   \begin{align}
+   \dd \pi_x.\dd x &= \left( \frac{1}{||x||_M} (I - \pi_x^M).\dd x.\frac{x^T}{||x||} + 
+   \frac{x}{||x||} \left( \frac{1}{||x||_M} (I - \pi_x^M).\dd x \right)^T \right) M \\
+   &= \frac{1}{||x||^2}\left( (I - \pi_x^M).\dd x.x^T + x \left( (I - \pi_x^M).\dd x \right)^T \right)M  \\
+   &= \frac{1}{||x||^2}\left( \pi_{x^\bot}.\dd x.x^T +  x \left( \pi_{x^\bot}.\dd x \right)^T \right)M \\
+   \end{align}
+  
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+   
+ 
+  

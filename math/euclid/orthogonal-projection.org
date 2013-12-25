@@ -1,0 +1,74 @@
+Projection Orthogonale
+
+#+setupfile: ~/org/style.org
+#+include: ~/org/latex.org
+
+Une fois établie l'existence d'un supplémentaire orthogonal pour tout
+sous-espace vectoriel $V$ de $E$ (noté $V^T$), on considère le
+projecteur sur $V$ parallèlement à $V^T$. Si l'on note $p_V(x)$ le
+projeté orthogonal de $x \in E$ sur $V$, on a la relation suivante:
+
+\[ x = p_V(x) + (x - p_V(x)) \]
+
+Ceci souligne le fait que $x - p_V(x) \in V^T$, ce qui nous servira
+par la suite.
+
+* Calcul du projeté
+
+Soit maintenant un vecteur $b \in E$. Par définition, son projeté
+$p_V(b) \in V$ autrement dit:
+
+\[ \exists! x \in \mathbb{R}^m, p_V(b) = V x \]
+
+Par définition, $b - p_V(b) \in V^T$ donc:
+
+\[ \forall z \in \mathbb{R}^m, \langle V z, b - p_V(b) \rangle = 0 \]
+
+Ce que l'on peut réécrire en:
+
+\[ \forall z \in \mathbb{R}^m, z^T V^{T} M (b - V x) = 0 \]
+
+Or le seul vecteur de $\mathbb{R}^m$ orthogonal à tout $z \in
+\mathbb{R}^m$, c'est $0$. On a donc:
+
+\[ V^{T}M(b - V x) = 0 \iff V^T M V x = V^T M b \]
+
+On obtient alors les sacro-saintes /équations normales/ qu'on pourra
+résoudre par diverses méthodes.
+
+* Moindres Carrés
+
+  Résoudre un système au sens des /moindres carrés/, c'est exactement
+  cela: si $Ax = b$ n'a pas de solutions, on peut toujours projeter
+  $b$ sur $Im(A)$ puis résoudre $Ax = \pi_{M,A}(b)$ qui, elle, a
+  toujours une solution. De plus, cette solution minimise par
+  définition l'erreur $||Ax - b||_M^2$. On obtient alors la solution
+  par:
+
+  \[ A^TMAx = A^TMb \]
+ 
+   
+* Projection sur un sous-espace
+
+Le paragraphe précédent suppose que l'on dispose d'une base $V$ du
+sous-espace vectoriel sur lequel projeter. En pratique, on a parfois
+affaire à un sous-espace affine de dimension $k \in \mathbb{N}$ défini
+comme solution d'un système linéaire, sur lequel on veut projeter un
+point $y$. Par le théorème de Pythagore, le projeté orthogonal
+minimise la distance Euclidienne, /i.e./:
+
+\[ x^\star = \underset{Ax = b}{argmin} ||x - y||_M^2 \]
+
+Les [[file:Multiplicateurs%20de%20Lagrange.org][multiplicateurs de Lagrange]] donnent la solution:
+
+\[ \exists \lambda \in \mathbb{R}^k / M(x^\star - y) = A^T \lambda
+\iff x^\star - y = M^{-1}A^T \lambda \]
+
+\[ \Rightarrow AM^{-1}A^T\lambda = b - Ay \]
+
+Un exemple est la résolution de contraintes cinématiques bilatérales:
+on veut projeter une vitesse $y$ non-contrainte sur l'espace contraint
+$Ax = b$ en injectant le moins d'énergie cinétique possible dans le
+système. Les $A^T \lambda$ sont les forces de contrainte.
+ 
+ 

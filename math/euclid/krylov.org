@@ -1,0 +1,40 @@
+Krylov Methods
+
+#+setupfile: ~/org/style.org
+#+include: ~/org/latex.org
+
+* Krylov Space
+  
+  Given a square matrix $A$ and a vector $b$, we define the i^th
+  Krylov space associated with $A$ and $b$ as:
+
+  \[ \Krylov_i(A, b) = \Span{b, Ab, A^2b, \ldots, A^i b} \]
+  
+  The Krylov space is an abstraction of the vector spaces containing
+  successive gradients/estimates in gradient descent methods: if we
+  seek to minimize the function $f(x) = \half x^TAx - b^Tx$, we obtain
+  the following sequence of gradients/solutions:
+
+  \[ r_0 = b, \quad x_0 = \alpha_0.b \]
+  \[ r_1 = b - Ax_0, \quad x_1 = x_0 + \alpha_1 r_1 \]
+  \[ \ldots \]
+
+  We see that at the i^th iteration, both the gradient and the
+  estimate belong to $\Krylov_i(A, b)$. For the Conjugate Gradient
+  method (CG, see below), this is also the case.
+
+* Lanczos Process
+  
+  Simply put, the Lanczos process is a way of building an orthogonal
+  basis of $\Krylov_i(A, b)$. 
+
+	It happens that the coefficient matrix is tridiagonal TODO.
+	
+* Conjugate Gradient
+	
+	
+
+* MINRES
+
+
+	

@@ -1,0 +1,179 @@
+Springs !
+
+#+setupfile: ~/org/style.org
+#+include: ~/org/latex.org
+
+Soit la fonction $f(x) = \norm{x - y} - l$ et soit $g(x) = \half
+\norm{f(x)}^2$. Amusons-nous à dériver deux fois, et utilisons cela
+comme énergie potentielle.
+
+* hop-hop-hop on recommence
+
+  On définit:
+  
+  \begin{align}
+  V(x) &= \half \norm{ h(x) }^2 \\
+  \\
+  h(x) &= \norm{ g(x) } - l \\
+  \\
+  g(x) &= x_i - x_j \\
+  \end{align}
+
+  Du coup:
+
+  \begin{align}
+  \dd V(x).\dd x &= h(x)^T.\dd h(x).\dd x \\
+  \\
+  \dd h(x).\dd x &= \frac{g(x)^T}{\norm{g(x)}}.\dd g(x).\dd x \\
+                 &= p(g(x))^T.\dd g(x).\dd x \\
+  \\
+  \dd g(x).\dd x & = \dd x_i - \dd x_j \\
+
+  \end{align}
+
+  Et donc:
+
+  \begin{align}
+  \dd^2 V(x).\dd x &= \dd x^T \dd h(x)^T.\dd h(x) + h(x)^T.\dd^2 h(x).\dd x \\
+  \\
+  \dd^2 h(x).\dd x &= \dd x^T.\dd g(x)^T.\dd p( g(x) )^T.\dd g(x) + p(x)^T.\dd^2 g(x).\dd x \\
+  \\
+  \dd^2 g(x).\dd x &= 0 \\
+  \end{align}
+  
+  On tricote:
+
+  \begin{align}
+  \dd^2 h(x).\dd x &= \dd x^T.\dd g(x)^T.\dd p( g(x) )^T.\dd g(x) \\
+  \\
+  \dd^2 V(x).\dd x &= \dd x^T.\block{ \dd h(x)^T.\dd h(x) \quad + \quad  h(x)^T.\dd g(x)^T.\dd p( g(x) )^T.\dd g(x) } \\
+                   &= \dd x^T.\dd g(x)^T.\block{ p(g(x)).p(g(x))^T \quad + \quad h(x)^T.\dd p( g(x) )^T}.\dd g(x) \\
+  \\
+  \dd p( g(x) ) &= \frac{1}{\norm{g(x)}} \block{I - p(g(x)).p(g(x))^T} \\
+  \\
+  \dd^2 V(x).\dd x &= \dd x^T.\dd g^T.\block{ p.p^T + \frac{h}{\norm{g}}\block{I - p.p^T}}.\dd g \\
+                   &=  \dd x^T.\dd g^T.\block{ \alpha I + (1 - \alpha) p.p^T }.\dd g \\
+  \end{align}
+
+  Le Hessien est donc:
+
+  \[ H = \dd g^T.\block{ U.S.U^T }.\dd g \]
+  
+  Avec $U = (p, v, w) \in O(3)$, $S = (1, \alpha, \alpha) \in
+  \Diag^3$, $\alpha = \frac{h(x)}{\norm{g(x)} }$.
+
+* Gradients
+
+Allons-y:
+
+\[ \dd f(x).\dd x = \frac{ (x - y)^T }{ \norm{x - y} }.\block{\dd x - \dd y} \]
+
+Soit $u = \frac{ x - y } { \norm{x - y} }$ et $J = (I_x, -I_y)$. On a donc:
+
+\[ \dd f(x).\dd x = u^T.J.\dd x \]
+
+Pour $g$, on a:
+
+\[ \dd g(x).\dd x = f(x)^T.\dd f(x).\dd x \]
+
+* Hessiens
+
+On commence par [[file:~/Private/org/notes/differential-geometry.org::**%20Normalization][rappeler]] que:
+
+\[ \dd \frac{x}{\norm{x}} = \frac{1}{\norm{x}} \pi_{x^\bot} = \frac{1}{\norm{x}} \block{I - \pi_x} \]
+
+Ainsi donc, on a:
+
+\[ \dd^2 f(x).\dd x.\bar{\dd x} = \block{\dd \frac{ x - y }{\norm{x - y}}. \bar{\dd x} }^T.J.\dd x \]
+
+Ce qui nous donne:
+
+\[ \dd^2 f(x).\dd x.\bar{\dd x} = \frac{1}{\norm{x - y}} \bar{\dd x}^T.J^T.\pi_{{x - y}^\bot}.J.\dd x \]
+
+
+Pour $g$ maintenant:
+
+
+\[ \dd^2 g(x).\dd x.\bar{\dd x} = \bar{\dd x}^T.\dd f(x)^T.\dd f(x).\dd x \quad + \quad f(x)^T.\dd^2 f(x).\dd x.\bar{ \dd x } \]
+
+D'après ce qui précède, voila qui nous donne comme matrice Hessienne:
+
+\[ \nabla^2 g(x) = J^Tu u^TJ \quad + \quad \frac{f(x)}{\norm{x - y}} J^T.(I - \pi_{x -y})J \]
+
+Ou, plus simplement:
+
+\[ \nabla^2 g(x) = J^Tu u^TJ \quad + \quad \block{1 - \frac{l}{\norm{x - y} } }.J^T(I - uu^T)J \]
+
+Soit $\alpha = \frac{l}{\norm{x - y} }$, on peut simplifier en:
+
+\begin{align}
+
+ \nabla^2 g(x) &= J^T.\block{ u u^T + (1-\alpha)(I - uu^T)}.J \\
+ &=  J^T.\block{ (1-\alpha).I + \alpha.uu^T}.J \\
+
+\end{align}
+
+On note que $\alpha > 1 \iff l > \norm{x - y}$ /i.e./ le ressort est en
+compression. L'application du centre est la suivante:
+
+- Elle laisse inchangée la direction $u$
+- Elle multiplie par $(1 - \alpha)$ l'hyperplan $u^\bot$
+
+Soit $Q = (u, v, w)$ une base orthonormée, on peut alors écrire:
+
+\[ \nabla^2 g(x) = J^T.Q.\diag(1, 1-\alpha, 1-\alpha).Q^T.J \]
+
+Ca nous donne une factorisation $\nabla^2 g(x) = L^T D L$ qui sera
+utile par la suite.
+
+** Hessien Approché
+
+   Dans une approche du style Gauss-Newton, on peut linéariser $f$
+   autour de la position précédente $x_k$:
+
+   \[ \tilde{f}(x) = \tilde{f}(x_k + h ) \approx f(x_k) + \dd f(x_k).h \]
+
+   On a alors:
+
+   \[ \tilde{g}(x) = \half \norm{ f(x_k) + \dd f(x_k) (x - x_k) }^2 \]
+
+   Du coup tout devient très simple:
+
+   \[ \nabla \tilde{g}(x) = \dd f(x_k)^T  f(x)  \] 
+
+   Puis forcément:
+
+    \[ \nabla^2 \tilde{g}(x) = \dd f(x_k)^T \dd f(x_k) \]
+
+    
+* Dynamique
+
+On a donc la géométrie des ressorts à l'ordre 2, on va pouvoir faire
+de la dynamique avec:
+
+\[ \LL = T - V = \half v^T M v \quad - \quad g(x) \]
+
+En prenant l'[[file:geometric-integrators.org::*Application:%20mass-string%20system][intégrateur]] suivant:
+
+\[ \block{M + \frac{h^2}{4} \nabla^2 V(x_k)}.v_{k+1} = p_k^T - \frac{h}{2}\nabla V(x_k) \]
+
+En prenant une décomposition du Hessien en $\nabla^2 V(x_k) = L^T D L$
+(/e.g/ par Cholesky, mais pas forcément), on obtient le système
+linéaire suivant:
+
+\[ \block{M + \frac{h^2}{4} L^T D L} v = r \]
+
+
+On peut utiliser la version KKT du système pour bénéficier des
+méthodes creuses:
+
+\[ 
+
+\mat{ M & -L^T \\
+      L & -\frac{4}{h^2}\inv{D} } \mat{v \\ \lambda} = \mat{r \\ 0 }
+
+\]
+
+
+Avec les Hessiens approchés, on prend simplement $L = \dd f (x_k)$ et
+$D = I$ dans l'équation ci-dessus.

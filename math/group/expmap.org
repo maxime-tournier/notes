@@ -1,0 +1,272 @@
+A Geometric Algorithm for the Exponential Map Derivative
+
+We present a general algorithm for computing the Fréchet derivative of
+the exponential and logarithm maps in matrix Lie groups. Unlike
+existing works in this area, our algorithm does not rely on a matrix
+representation of group and algebra elements, but instead directly
+uses the Lie group and algebra geometry. 
+
+We give experimental results, compare to matlab, and so on.
+
+#+setupfile: ~/org/style.org
+#+include: ~/org/latex.org
+
+
+* Introduction
+
+* Previous Works
+
+* Notations
+
+  Let $G$ be a matrix Lie group and $\mathfrak{g}$ its Lie
+  algebra. The left (resp. right) translation by $g \in G$ is noted
+  $L_g$ (resp. $R_g$). The adjoint representation of the group
+  (resp. algebra) is denoted by $Ad$ (resp $ad$). The Lie bracket of
+  $x, y \in \mathfrak{g}$ is given by $[x, y] = ad(x).y$.
+  
+  Given a map between Lie groups $f: G \to H$, we write the
+  left-trivialized (resp. right) tangent map of $f$ at $g$ as $\dL
+  f(g)$ (resp. $\dR f(g)$). The trivialized tangents are mappings from
+  and to the respective Lie algebras, and are obtained by trivializing
+  tangent vectors on both ends:
+  
+  \begin{align}
+  \dd f(g) &= \dd L_{f(g)}.\dL f(g).\dd L_{\inv{g}} \\
+           &= \dd R_{f(g)}.\dR f(g).\dd R_{\inv{g}} \\
+  \end{align}
+  
+  One can verify that for all $g \in G, \dd g \in \mathfrak{g}$, $\dL
+  Ad_g.\dd g = \dR Ad_g.\dd g = ad(\dd g)$. The exponential map is
+  defined by the usual power series:
+
+  \begin{align}
+  \exp: \mathfrak{g} &\to G \\
+  \exp(x) &= \sum_i \frac{x^i}{i!} \\
+  \end{align}
+  
+  The exponential map realizes a diffeomorphism on a neighborhood of
+  the algebra zero element. The (principal) logarithm is the inverse
+  of $\exp$ on this neighborhood. TODO ...
+  
+  We recall that TODO ref:
+  
+  \begin{equation}
+  \label{eq:ad-exp}
+  \exp\block{ ad(x) } = Ad_{\exp(x)} 
+  \end{equation}
+
+* Hausdorff Formula
+
+  Equation (\ref{eq:ad-exp}) shows that:
+
+  \[ Ad_{\exp(x)}.x = x \]
+  
+  Deriving the above equation gives, for all $\dd x \in \mathfrak{g}$:
+
+  \[ \block{\dR Ad_{\exp(x)}.\dR \exp(x).\dd x}.x + Ad_{\exp(x)}.\dd x = \dd x \]
+
+  Using the adjoint representation, we obtain:
+
+  \[ ad\block{ \dR \exp(x).\dd x }.x = \block{I - Ad_{\exp(x)}}.\dd x \]
+  
+  Exploiting the anti-symmetry of $ad$, we finally obtain:
+  
+  \[ ad(x).\dR \exp(x) = Ad_{\exp(x)} - I \]
+
+  Or, equivalently: (TODO mmhhhh...)
+  
+  \[ \dR \exp(x) = \sum_i \frac{ ad(x)^i }{(i + 1)!} \]
+
+  This shows that $\dR \exp(x)$ and $ad(x)$ commute.
+
+** Stable Subspaces
+  
+$\Ker{ ad(x) }$ and $\Image{ ad(x) }$ are stable by:
+
+- $ad(x)$ (obviously)
+- $Ad_{\exp(x)}$
+- $\dR \exp(x), \dL \exp(x)$
+- and thus $\dR \log(x), \dL \log(x)$
+
+Moreover, $\Ker{ad(x)}$ is /fixed/ by $Ad_{\exp(x)}$, $Ad_{\exp(-x)}$.
+
+* Derivative Computation
+
+** Kernel-Image Projection
+   
+   Here we introduce a convenient notation for the projection over the
+   image of a linear operator, parallel to its kernel. Given a linear
+   map $A: \mathfrak{g} \to \mathfrak{g}$, the kernel and image of $A$
+   are in direct sum in $\mathfrak{g}$:
+   
+   \[ \mathfrak{g} = \Ker{A} \oplus \Image{A} \]
+
+   As such, for any $x \in \mathfrak{g}$, there exist unique $u \in
+   \Ker{A}$ and $v \in \Image{A}$ such that $x = u + w$. This in turn
+   implies that there exists some $v \in \mathfrak{g}$ such that:
+
+   \[ x = u + A.v \]
+
+   The element $w$ is unique modulo $\Ker{A}$, and as such can be seen
+   as an element of the quotient space
+   $\quotient{\mathfrak{g}}{\Ker{A}}$. We write the decomposition of
+   $x$ into $u \in \Ker{A}$ and $v \in
+   \quotient{\mathfrak{g}}{\Ker{A}}$ as:
+   
+   \[ x = u \oplus_A v \]
+
+	 We finish by noting that for any linear isomorphism $M$ of the Lie
+	 algebra that leaves $Ker{A}$ fixed (TODO et donc aussi par Minv),
+	 we have:
+	 
+	 \[ x = u \oplus_A v \iff Mx = Mu \oplus_{MA} v = u \oplus_{MA}v \]
+   
+** Exponential
+
+  Let $\dd x = u \ \oplus_{ad(x)} \ v$. The right-trivialized tangent
+  of the exponential map satisfies:
+
+  \[ \dR \exp(x).\dd x = u + \block{Ad_{\exp(x)} - I}.v \]
+	
+	The left-trivialized tangent is given by:
+	
+	\begin{align}
+	\dL \exp(x).\dd x &= Ad_{\exp(-x)}.\dR \exp(x).\dd x \\
+	& = u + \block{I - Ad_{\exp(x)}}.v \\
+	\end{align}
+
+	since $u$ is invariant by $Ad_{\exp(-x)}$.
+
+** Logarithm
+  
+  Let $\dd g = u\ \oplus_{(Ad_g - I)} \ v$. The right-trivialized
+  derivative of the logarithm satisfies:
+  
+  \[ \dR \log(g).\dd g = u + ad\block{ \log(g) }.v \]
+	
+	The left-trivialized tangent is given by:
+	
+	\begin{align}
+	\dL \log(g).\dd g &= \dR \log(g).Ad_{g}.\dd g \\
+	\end{align}
+
+	Since $Ad_{g}$ leaves $\Ker{ad(x)}$ fixed, the decomposition
+	$Ad_{g}.\dd g = u \oplus_{(Ad_g - I)} \ v$ can be obtained by
+	decomposing $\dd g$ along:
+	
+	\[ \dd g = u \oplus_{(I - Ad_{\inv{g}})} \ v \]
+	
+	(TODO by proposition ... )
+	
+	The result is then, as above:
+	
+	\[ \dL \log(g).\dd g = u + ad\block{ \log(g) }.v \]
+	
+
+	
+
+* TODO Pullback Computation
+
+* Experimental Results
+
+
+* Example: $SO(3)$
+
+** Exponential
+   
+   Working in $\mathfrak{so(3)}$ coordinates, we have:
+
+   \[ ad(x).y = \hat{x}.y \]
+   
+   We want to obtain the decomposition $\dd x = u \oplus
+   ad(x).v$. This can be seen as finding $v$ such that:
+
+   \[ ad(x)\block{ \dd x - ad(x).v } = 0 \]
+
+   That is:
+
+   \[ ad(x)^2.v = ad(x).\dd x \]
+
+   We exploit the fact that for $x \in \mathfrak{so(3)}$, the
+   following identity holds:
+
+   \[ \hat{x}^3 = - \norm{x}^2 \hat{x} \]
+   
+   Thus, in our case:
+   
+   \[ ad(x)^3.\dd x = -\norm{x}^2 ad(x). \dd x \]
+
+   It is then easy to see that choosing $v = -\frac{1}{\norm{x}^2}
+   ad(x).\dd x$ provides the correct decomposition.
+
+* Example: $SE(3)$
+
+  For $\kappa = (\omega, v) \in \mathfrak{se(3)}$, the adjoint is
+  given by:
+
+  \[ ad(\kappa) = \mat{ \omega & 0 \\ v & \omega } \]
+
+  As above, we are looking for $y$ such as:
+
+  \[ ad(x)^2.y = ad(x).\dd x \] 
+
+  The squared adjoint is then given by:
+
+  \[ ad(x)^2 = \mat{ \omega^2 & 0 \\ \omega v + v \omega & \omega^2 } \]
+
+  TODO notations :-/
+  Bref on veut:
+
+  \[ \mat{\omega^2 & 0 \\ \omega v + v \omega & \omega^2 } \mat{x \\ y}  = \mat{ \omega & 0 \\ v & \omega } \mat{a \\ b } \]
+
+  C'est à dire:
+
+  \begin{align}
+  \omega^2 x &= \omega a \\
+  \block{\omega v + v \omega} x + \omega^2 y &= v a + \omega b \\
+  \end{align}
+
+  On réécrit la derniere ligne:
+
+  \[ \omega^2 y = \omega \block{b - v x} + v \block{a - \omega x} \]
+
+  La question à mille francs, c'est de savoir si $\block{a - \omega x}
+  = \alpha.\omega$ car alors on est ramené au problème suivant dans
+  $SO(3)$:
+
+  \[\omega^2 y = \omega \block{ b - v x - \alpha v} \]
+
+  Il se trouve que oui et que c'est magnifique: la première ligne
+  donne comme solution pour $x$:
+
+  \[x = -\frac{1}{\norm{\omega}^2} \omega a \]
+  
+  Ainsi:
+
+  \[\block{a - \omega x} = \block{I + \frac{\omega^2}{\norm{\omega}^2}}.a \]
+  
+  Appelons $n = \frac{\omega}{\norm{\omega}}$, le jeu c'est de savoir si:
+
+  \[ \block{ I + n^2 } a \sim n \]
+
+  C'est le cas, puisque $I + n^2 = n.n^T$. Cela se voit facilement en
+  développant le produit de quaternions: 
+
+  \[ 0 = (1 + n^2).a \]
+  
+  Du coup, on obtient que $\alpha = \block{a - \omega x} = n n^T a$,
+  en d'autres termes $\alpha = \frac{\omega^T a}{\norm{\omega}^2}$.
+
+  Au final, on obtient donc:
+
+  \begin{align}
+  x &= -\frac{1}{\norm{\omega}^2} \omega a \\
+  y &= -\frac{1}{\norm{\omega}^2} \omega \block{ b - v x - \alpha v} \\ 
+  \end{align}
+  
+  Ce qui est rigolo, c'est que $x$ et $\alpha$ sont exactement les
+  composantes du produit de quaterenions
+  $\frac{\omega}{\norm{\omega}^2}.a$.
+
+* Conclusion
+

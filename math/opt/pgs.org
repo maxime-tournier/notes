@@ -1,0 +1,5 @@
+(Projected) Gauss-Seidel
+
+#+include: ~/org/latex.org
+
+TODO !

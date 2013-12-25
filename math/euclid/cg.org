@@ -1,0 +1,5 @@
+Conjugate Gradient
+
+#+include: ~/org/latex.org
+
+TODO !

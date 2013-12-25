@@ -1,0 +1,69 @@
+Bilevel Programming
+
+#+include ~/org/latex.org
+#+setupfile: ~/org/style.org
+  
+We consider the following control problem:
+
+\[ min \half ||Qv - q||^2 \]
+ 
+  
+Subject to the following constraints, where $A^T \mu$ are the
+actuators, and $J^T \lambda$ are the normal reaction forces:
+
+1. Dynamics: $Mv = f + J^T \lambda + A^T \mu$
+2. Unilateral constraints: $0 \leq J v - b \quad \bot \quad  \lambda \geq 0$
+3. Actuator bounds: $C\mu \geq c$
+
+
+The complementarity condition in (2) makes this problem non-convex,
+and unfortunately convex quadratic relaxations are [[file:unilateral-control.org][not very
+helpful]]. Here is an iterative algorithm which tries to solve this.
+
+
+
+* Geometry  
+
+  Let us forget about the actuation forces for now. Solving unilateral
+  constraints essentially consists in minimizing the quadratic form
+  $\half v^TMv - f^Tv$ over the /feasible set/ $\mathcal{C} = {Jv \geq b}$,
+  as shown by the K.K.T conditions.
+
+  Up to a constant term, this quadratic form can be interpreted as the
+  /kinetic/ distance between the /constrained/ velocity $v$, and the
+  /unconstrained/ velocity $\inv{M}f$:
+
+  \[ \half ||v - \inv{M}f||_M^2 = \half v^TMv - f^Tv \quad + \quad \half f^T\inv{M}f \]
+  
+  The kinetic distance gives a much more intuitive view of the
+  problem: we look for the $M$-projection of $\inv{M}f$ over
+  $\mathcal{C}$:
+
+  \[ v = \pi_\mathcal{C}^M ( \inv{M} f) \]
+  
+  The control problem can thus be summarized more compactly:
+
+  \[ min ||Qv - q||^2 \]
+    
+  1. Constrained dynamics: $v = \pi_\mathcal{C}^M ( \inv{M} (f + A^T \mu) )$
+  2. Actuator bounds: $C\mu \geq c$
+     
+  Due to the non-linearity of $\mathcal{C}$, the projection
+  $\pi_\mathcal{C}^M$ is a /globally/ non-convex, non-smooth operator,
+  which is clearly not desirable if we need to use it in the global
+  control problem, for instance to obtain a actuator gradient for the
+  control objective function.
+  
+  However, since $\mathcal{C}$ is a convex polytope, we propose to
+  /locally/ approximate the projection operator by a linear
+  $M$-orthogonal projection, at least in a sufficiently small
+  neighborhood where the active set does not change. This local
+  approximation allows to obtain a gradient for the control problem.
+  
+* Projection Approximation
+
+
+
+* Gradient
+
+

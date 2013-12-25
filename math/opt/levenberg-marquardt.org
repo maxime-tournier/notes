@@ -1,0 +1,150 @@
+Levenberg-Marquardt Algorithm
+
+#+include: ~/org/latex.org
+#+setupfile: ~/org/style.org
+
+The Levenberg-Marquardt algorithm is a popular non-linear
+least-squares algorithm based on a damped Gauss-Newton approach. Since
+these are fairly standard stuff in Computer Graphics, we review all
+these methods here, including some geometric interpretations. Most of
+this is based on Wikipedia.
+
+* Newton's Method
+
+Given a function $f: E \rightarrow E$ of some Euclidean space $E$, the
+Newton's algorithm is used to find a root of $f$, that is some $x\in
+E$ such as $f(x) = 0$. To this end, the Newton's method will
+approximate the function $f$ to the first-order using its
+differential:
+
+\[ f( x + h ) \approx f(x) + \dd f(x).h \]
+
+Assuming $f$ is smooth and $\dd f(x)$ is invertible, we compute the
+next step by solving the root equation on the linear approximation:
+$f(x) + \dd f(x).h \approx f(x+h) = 0$, that is:
+
+\[ \dd f(x).h = -f(x) \]
+
+Newton's method has quadratic convergence in a neighborhood of the
+solution.
+
+** Use in Optimization
+   
+   Newton's method is sometimes used in optimization to find critical
+   points of a function $f:E \rightarrow \RR$, /i.e./ points where:
+
+   \[ \nabla f(x) = 0 \]
+
+   The final update formula includes the /Hessian/ of $f$ :
+
+   \[ \nabla^2 f(x).h = -\nabla f(x) \] 
+
+   
+* Gauss-Newton Algorithm
+
+The Gauss-Newton algorithm extends the Newton's algorithm for the case
+of a function $f: E \rightarrow F$ with $dim(E) \neq dim(F)$. Judging
+from the dimensions, the original root-finding problem is /ill-posed/,
+meaning there could be zero, one, several or even an infinity of
+solutions to $f(x) = 0$. Therefore, its makes more sense to consider
+the following minimization problem instead:
+
+\[ x^\star = \argmin{x \in E} \quad  \half ||f(x)||^2  \]
+
+An exact algorithm would look for the step $h$ that minimizes the
+objective:
+
+\[ h^\star = \argmin{h \in T_x E} \quad \half ||f(x + h)||^2 \]
+
+Applying Newton's method for optimization to the above problem would
+require the computation of second-derivatives $\dd^2 f$, which is
+often both complicated and costly. Instead, Gauss-Newton's algorithm
+uses the tangent approximation of $f$ around $x$, resulting in the
+following linear least-squares problem:
+
+\[ h^\star = \argmin{h \in T_x E} \quad \half ||f(x) + \dd f(x).h)||^2 =: g(h) \]
+
+When $dim(F) > dim(E)$, the final equations to solve at each step are:
+
+\[ \dd f(x)^T.\dd f(x).h = - \dd f(x)^T.f(x) \]
+
+A more compact formulation is simply to say that the Gauss-Newton
+method solves the approximate tangent problem:
+
+\[ \dd f(x).h = -f(x) \]
+
+...in the least-square sense.
+
+
+* Levenberg's Algorithm
+  
+  Levenberg introduced a /damping/ parameter, usually named $\lambda
+  \in \RR$, in the tangent equations resolution:
+
+  \[ \left( \lambda I + J^TJ \right).h = -J^T.f \]
+  
+  where $J$ is the Jacobian matrix of $f$ at $x \in E$. This damping
+  factor can be interpreted in two ways:
+  
+  - Penalize large values for $h$ during the resolution of the linear
+    least-squares, since the damped normal equations correspond to:
+
+    \[ h = \argmin{h \in E} \quad \half || f + J.h ||^2 \quad +
+    \quad \half \lambda ||h||^2 \]
+    
+  - Interpolate between the Gauss-Newton algorithm and a gradient
+    descent on $g$, since for large values of $\lambda$ the solution
+    will be approximately:
+
+    \[ h \approx -\frac{1}{\lambda} J^T f = - \frac{1}{\lambda} \nabla g(x) \]
+    
+  The main problem with this approach is that it is usually difficult
+  to find a good $\lambda$ in practice, especially when $f$ alternates
+  between flat and curved behaviors: too high values of $\lambda$ will
+  result in slow convergence (gradient descent), while setting it too
+  low will sometimes have trouble converging at all.
+
+* Marquardt's Idea
+
+  Marquardt's insight was to selectively damp dimensions of $E$
+  according to the /curvature/ of the function $g$:
+
+  - In the directions where $g$ is almost flat, the linear
+    approximation is relevant, therefore the damping should be small.
+
+  - In the directions of high curvature, the linear approximation
+    should not be trusted but the gradient direction[fn:gradient]
+    should be used instead, through a high damping.
+
+  The Hessian $\nabla^2 g(x)$ is given by $H = J^T J$, thus the local
+  curvature for dimension $i$ is given by $H_{i,i}$. The resulting
+  normal equations are therefore:
+  
+  \[ \left( \lambda.diag(J^TJ) + J^TJ \right).h = -J^T.f \]
+
+  where $\lambda$ is now the amount of Levenberg-Marquardt damping. In
+  practice, this amounts to scaling the diagonal elements of $J^TJ$ by
+  $1 + \lambda$.
+
+  A somewhat less subtle interpretation is to say that since the
+  linear approximation is only valid /locally/, we should damp
+  directions where the velocity is high as these tend to be
+  unreliable.
+    
+
+* Metric Considerations
+
+  All the above was performed using the canonical metric on $E$ and
+  $F$, but different metrics could be used for solving the linear
+  least-squares. The very notions of /gradient/ and /Hessian/ are
+  metric-dependent.
+
+  In the probabilistic literature, these metrics are usually related
+  to the /state/ and /observation/ Probability Distribution Functions.
+  
+
+
+* Footnotes
+
+[fn:gradient] Note that $\nabla g$ is also the gradient of the /exact/
+problem.

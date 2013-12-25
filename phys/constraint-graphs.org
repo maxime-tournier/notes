@@ -1,0 +1,198 @@
+Constraint Graphs
+
+
+#+include: ~/org/latex.org 
+#+setupfile: ~/org/style.org
+
+It is probably a good idea to have a look at [[../math/cholesky.org][Cholesky]] first.
+
+* TODO
+  - detail the full incomplete preconditioner (acyclic + loop
+    closures)
+* Constraint Graphs
+
+Let $H$ be the following K.K.T. matrix:
+
+\[ H = \mat{M & J_a^T & J_c^T \\ J_a & 0 & 0 \\ J_c & 0 & 0 } \]
+
+where $J_a$ is the acylic part of the constraint matrix and $J_c$ are
+the loop-closure constraints.
+
+If we assume that the acyclic part has been numbered first,
+loop-closure constraint vertices all become /roots/ of the DAG. If we
+don't want to introduce fill-in in the loop-closure part, the only
+$H_{ij}$ blocks we need to process are the ones corresponding to the
+constraint blocks between dof $i$ and constraint $j$ (/i.e./ we ignore
+cross-constraint coupling).
+
+Since no common child exist between dof $i$ and loop-closure
+constraint $j$ (no contraint/constraint edges, and no double edges
+from constraints to dofs), the only update for block $H_{ij}$ is:
+
+\[ H_{ij} := \inv{H_{ii}} H_{ij} \]
+
+We can postpone this update to obtain the following two-stage
+incomplete factorization:
+
+@<div class="algorithm">
+  - for each acyclic vertex $i$ in *postfix* order /acyclic part/
+      - for each *child* vertex $k$ of $i$ 
+        - $H_{ii} := H_{ii} -  H_{ki}^T H_{kk} H_{ki}$  
+      - for *the* parent vertex $j$ of $i$ in the acyclic part, if
+        any:
+        - $H_{ij} := \inv{H_{ii}} H_{ij}$
+
+
+  - for each loop-closure vertex $i$ /loop closures/
+      - for each *child* vertex $k$ of $i$ 
+	 - $H_{ki} :=  \inv{H_{kk}} H_{ki}$
+         - $H_{ii} := H_{ii} -  H_{ki}^T H_{kk} H_{ki}$
+@</div> 
+
+
+** Preconditioner
+
+*** Incomplete Factor
+
+We simplify the above a little bit:
+
+@<div class="algorithm">
+ - for each acyclic vertex $i$ in *postfix* order /acyclic part/
+      - for each *child* vertex $k$ of $i$ 
+        - $H_{ii} := H_{ii} -  H_{ki}^T H_{kk} H_{ki}$  
+      - for *the* parent vertex $j$ of $i$, if any:
+        - $H_{ij} := \inv{H_{ii}} H_{ij}$
+
+
+ - for each loop-closure vertex $i$ /loop closures/
+      - for each *child* vertex $k$ of $i$ 
+         - $H_{ii} := H_{ii} -  H_{ki}^T \inv{H_{kk}} H_{ki}$
+@</div> 
+   
+*** Precond
+
+Computing the preconditioner for loop closures amounts to applying the
+solve algorithm with the above incomplete factorization, using $z =
+(0, 0, b)$ as the right-hand size, and return the part of the solution
+associated with loop vertices.
+
+Thus, the general solve algorithm: 
+
+@<div class="algorithm">
+   - for each vertex $i$ in *postfix* order
+     - $x_i := z_i$ /zero except for loop closures/
+     - for each *child* vertex $j$ of $i$
+       - $x_i := x_i – H_{ij}^T x_j$ /nothing changes/
+
+
+   - for each vertex $i$ in *prefix* order
+       - $x_i := \inv{H_{ii}} x_i$
+     - for each *parent* vertex $j$ of $i$
+       - $x_i := x_i – H_{ij} x_j$
+@</div> 
+
+...reduces in this case to:
+
+@<div class="algorithm">
+  - for each loop closure vertex $i$
+    - $x_i = \inv{H_{ii}} b_i$
+@</div>
+
+
+ 
+* Wait, what ?
+
+Let us give some details on how we can invert the /small/ Schur
+complement corresponding to loop closures by solving the /large/ K.K.T.
+system with a specific right-hand side.
+
+** Linear Response
+
+In all generality, the coupling between velocity and net momentum
+ (inertia + integrated external forces) is expressed through the mass
+ matrix:
+
+\[ M v = p \]
+
+In the absence of constraints (/i.e./ when all the DOFs are
+available), this mass matrix is invertible, and the velocity is a
+/linear/ function of the momentum:
+
+\[ v = \inv{M} p \]
+
+If we add bilateral kinematic constraints of the form:
+
+\[ J v = b \]
+
+The response becomes:
+
+\[ v = \inv{M}\block{p + J^T \lambda} \]
+
+where $\lambda$ is the solution of:
+
+\[ J\inv{M}J^T \lambda = b - J\inv{M}p \]
+
+Calling $K = J\inv{M}J^T$, we see that unless $b = 0$ (/e.g./ for
+holonomic constraints), the response velocity is no longer linear in
+the momentum $p$, but rather an /affine/ function:
+
+\[ v = \inv{M}\block{p + J^T \inv{K} \block{b - J\inv{M}p} } \]
+
+Or, rearranging terms, and calling $L = J\inv{M}$:
+
+\[ v = \block{ \inv{M} - L^T \inv{K} L } p \quad + \quad L^T \inv{K} b \]
+
+We may summarize the constrained system response as:
+
+\[ v(p) = \inv{ \tilde{M} } p + c \]
+
+...keeping in mind that this notation is particularly error-prone
+since $\inv{ \tilde{M} }$ is no longer invertible, since some
+velocities are now unreachable. However, the thing to remember at this
+point is that *computing $v = \inv{ \tilde{M} } p$ can be done by
+solving*:
+
+\[ \mat{M & -J^T \\ J & 0 }\mat{v \\ \lambda} = \mat{p \\ 0} \]
+
+** Adding Constraints
+
+If we now need to enforce additional constraints $G v = g$ on the
+system, we may directly use the constrained system response as a black
+box. More precisely, given unconstrained momentum $p$, we introduce
+constraint impulses $G^T \mu$ and solve for $\mu$ such that:
+
+\[ G v( p + G^T \mu ) = g \]
+
+That is:
+
+\[ G \block{ \inv{ \tilde{M} } \block{ p + G^T \mu}  + c } = g \]
+
+Rearranging terms, we obtain:
+
+\[ G \inv{ \tilde{M} } G^T \lambda = g - G v(p) \]
+
+Let $h = g - G v(p)$ to keep things legible. From what precedes,
+computing $\inv{ \tilde{M} } G^T \mu$ can be done by solving the
+following system (assuming we know $\mu$):
+
+\[ \mat{ M & -J^T \\ J & 0 } \mat{v \\ \lambda } = \mat{G^T \mu \\ 0 } \]
+
+If we don't know $\mu$ but do know the additional constraints to place
+on $v$, well we just need to solve:
+
+\[ \mat{M & -J^T & -G^T \\ J & 0 & 0 \\ G & 0 & 0 } \mat{v \\ \lambda
+\\ \mu } = \mat{0 \\ 0 \\ h} \]
+
+/(making the system symmetric again is just a matter of switching a
+few signs)/
+
+The $\mu$ we obtain are /exactly/ the ones that solve:
+
+\[ G \inv{ \tilde{M} } G^T \mu = h \]
+
+Thus, if we obtain an incomplete Cholesky decomposition for the
+/large/ K.K.T. system, we can still use it to approximately solve for
+the /small/ Schur complement (for loop-closures). In other words, we
+have a preconditioner for the /small/ Schur.
+
+ 

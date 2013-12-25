@@ -1,0 +1,602 @@
+Lie Groups
+
+These are notes on the wonderful (here basic) Lie group theory. Some
+familiarity with [[TODO][differentiable manifolds]] is assumed.
+
+#+setupfile: ~/org/style.org
+#+include: ~/org/latex.org
+
+
+
+* Definition 
+
+  A Lie group $G$ is a real smooth manifold of finite dimension, which
+  is also a group with smooth operations (product, inverse). /Matrix/
+  Lie groups are subgroups of $GL_n(\RR)$. 
+
+	Examples of Lie groups include:
+
+  - $(\RR^n, + )$, as a vector space
+  - $(\RR^{n+\star}, .)$, as a multiplicative space
+  - $(\CC^\star, .)$, non-zero complex numbers
+  - $U(n)$, unitary groups and in particular:
+  - $U(1) = SU(1)$, unitary complex numbers
+  - $O(n), SO(n)$ (special) orthogonal groups
+  - $SL(n)$, special linear groups
+  - $E(n), SE(n)$, (special) euclidean groups
+  - $GL(n)$, general linear groups
+  - $SU(n)$, special unitary groups and in particular:
+  - $SU(2) \simeq (S^3, .)$, unit quaternions
+	
+	Any direct product of the above is again a Lie group. Quite a lot of
+	spaces can therefore be studied under the light of Lie group theory.
+
+* Tangent Bundle
+
+  Two maps are of particular interest for the study of Lie groups:
+  left and right translations. Let $h \in G$, these maps are defined
+  by:
+  
+  \[ L_h: G \to G, \quad L_h(g) = h.g \] 
+  \[ R_h: G \to G, \quad R_h(g) = g.h \]
+  
+  The two are diffeomorphisms. Differentiating thus induces
+  diffeomorphisms on tangent spaces. In particular, differentiation at
+  the identity gives:
+
+  \[ \dd L_h(e): T_e G \to T_h G \]
+  \[ \dd R_h(e): T_e G \to T_h G \]
+  
+	The tangent space at any point $h$ can thus be mapped to the tangent
+  space at the identity using either $\dd L_{\inv{h}}(e)$ or $\dd
+  R_{\inv{h}}(e)$, and this mapping varies smoothly with $h$. Thus,
+  there is a /global/ vector bundle isomorphism from the trivial
+  bundle $(G, T_e G)$ to the tangent bundle $TG$, which is to say that
+  $G$ is always a /parallelizable/ manifold.
+
+	The tangent space at the identity thus provides a canonical
+  coordinate space for representing tangent vectors by left or right
+  translation. This process is called the /left/ and /right/
+  trivialization of tangent vectors. In robotics, the left/right
+  trivialized tangent vectors are sometimes called body/spatial
+  coordinates. 
+
+	One can of course convert between left and right
+  trivializations. This is done using the /adjoint/ map:
+
+	\[ Ad_h : T_e G \to T_e G \]
+
+  \[ Ad_h = \dd L_h(e) \circ \dd R_\inv{h}(e) \]
+  
+  More precisely, $Ad_h$ convert a left-trivialized tangent vector at
+  $h$ to a right-trivialized tangent vector at $h$. For matrix Lie
+  groups, the translation differentials are trivial:
+
+  \[ \dd L_h(e).x = h.x \]
+  \[ \dd R_h(e).x = x.h \]
+  
+  Thus, in this case the adjoint is simply:
+
+  \[ Ad_h.x = h.x.\inv{h} \]
+
+	Trivialization can also be applied to tangent maps. Let $f : G \to
+	H$ be a map between Lie groups, we can form the left or right
+	trivialized tangent maps of $f$ at $g \in G$ by trivializing tangent
+	vectors on both ends of the tangent map $\dd f(g)$:
+
+	\[ \dL f(g): T_e G \to T_e H \]
+	\[ \dR f(g): T_e G \to T_e H \]
+
+	More precisely, the following relations should be satisfied:
+
+	\begin{align}
+	\dd f(g) &= \dd L_{f(g)}(e).\dL f(g).\dd L_{\inv{g}} \\
+	&= \dd R_{f(g)}(e).\dR f(g).\dd R_{\inv{g}}
+	\end{align}
+	
+	Again, the adjoint can be used to convert between left/right
+	trivializations:
+
+	\[ \dR f(g) = Ad_{f(g)}.\dL f(g).Ad_{\inv{g}} \]
+	
+* TODO Lie Algebra  
+
+	- Invariant vector fields
+	- Isomorphic to the tangent space at the identity
+	- Lie bracket of vector fields => lie bracket over the tangent space at identity
+	- Lie algebra structure
+	- Lie bracket for matrix groups
+
+* Adjoint
+
+The inner (or conjugation) automorphisms $\Psi_g$, for $g \in G$, play
+a central role in the (Lie) group theory. They are defined as:
+
+\begin{align}
+\Psi: G &\to Aut(G) \\
+\Psi_g(h) &= g.h.\inv{g} \\
+\end{align}
+
+In particular, $h$ commutes with $g$ if and only if $h$ is a fixed
+point of $\Psi_g$. $\Psi$ is a group homomorphism from $G$ to $Aut(G)$
+with plenty of interesting [[http://en.wikipedia.org/wiki/Inner_automorphism][properties]].
+
+The derivative of $\Psi_g$ at the identity is the adjoint map at $g$
+encountered [[Tangent Bundle][previously]], and is defined as:
+
+\begin{align}
+Ad_g &: \quad  \mathfrak{g} \to \mathfrak{g} \\
+Ad_g &=\dd L_g \circ \dd R_{\inv{g}} \\
+\end{align}
+
+The adjoint $Ad_g$ is obviously invertible for all $g \in G$ , and one
+can verify that $Ad$ realizes a Lie group homomorphism from the group
+to the automorphisms of the Lie algebra:
+
+\[ Ad: G \to GL(\mathfrak{g}) \]
+
+This is called the /adjoint representation of the Lie group/ over its
+Lie algebra. It is interesting because it allows one to represent
+group elements by linear maps (matrices in the case of finite
+dimension), whatever the initial group is.
+
+It turns out that the derivative of the adjoint representation of the
+group, at the group identity, also provides the Lie algebra structure:
+
+\begin{align}
+ad: \mathfrak{g} &\to \mathfrak{gl(g)} \\
+ad(x).y &= x.y - y.x \\
+\end{align}
+
+In other words, $ad(x).y$ is the commutator, or Lie bracket:
+
+\[ ad(x).y = [x, y] \]
+
+The $ad$ map is called the /adjoint representation of the Lie
+algebra/, as it preserves the Lie bracket:
+
+\[ ad [x,y] = [ad(x), ad(y)] \]
+
+It can be used for the left and right trivialization of the derivative
+of the adjoint map:
+
+\begin{align}
+\dL Ad_g.\dL g &= ad(\dL g) \\
+\dR Ad_g.\dR g &= ad(\dR g) \\
+\end{align}
+
+To summarize, the maps below are homomorphisms for the relevant
+structure:
+
+  - $Ad: G \to GL(\mathfrak{g}) \quad$ (Lie group)
+  - $ad: \mathfrak{g} \to \mathfrak{gl(g)}\quad$ (Lie algebra)
+    
+
+The adjoint plays along nicely with the exponential:
+
+\[ Ad_{\exp(x)} = \exp\block{ad(x)} \]
+
+* Coadjoint 
+
+Due to non-commutativity, the pullback of the inner automorphism
+$\Psi_g$ does /not/ provide a group representation:
+
+\[ Ad^\star_{g.h} = Ad^\star_h.Ad^\star_g \]
+
+But instead, using both transpose /and/ inverse does the trick:
+
+\[ Ad^\star_g = \block{ Ad_{\inv{g}} }^\star \]
+
+This map is called the /coadjoint representation/ of $G$ over its Lie
+/coalgebra/:
+
+\[ Ad^\star : G \to GL(\mathfrak{g}^\star) \]
+
+Again, by differentiating the coadjoint representation at the identity
+one can obtain the /coadjoint representation/ of the Lie algebra:
+
+\[ ad^\star(x) = \dd Ad^\star(e).x = -ad(x)^\star \]
+
+Notice that here again we need both minus /and/ transpose to obtain a
+Lie algebra representation:
+
+\[ ad^\star : \mathfrak{g} \to \mathfrak{gl(g^\star)} \]
+
+* TODO Exponential Map
+	
+	- Flow of left/right invariant vector fields
+	- Matrix power series for matrix groups
+	- Connected / simply connex groups / properties of exp
+	- Relations with adjoint
+	- BCH formula
+	- Exponential derivative
+	- Logarithm, derivative
+		
+* TODO Classification
+
+	The hard stuff...
+
+	- Abelian, nilpotent, solvable, simple and semi-simple groups/algebras
+	- Dynkin's diagrams
+	- Killing form, solvable, semi-simple/nilpotent lie algebras
+	- Root systems, Weyl chambers
+	- Group series, exceptional simple groups
+
+
+* Cheat Sheet
+  
+(For matrix groups)
+
+** Product
+   
+   The matrix product is bilinear, thus:
+ 
+   \[ \dd ab = \dd a.b + a.\dd b \]
+
+   Hence:
+   
+   \begin{align}
+   \db ab &= Ad_{\inv{b}} \db a + \db b \\
+   \ds ab &= \ds a + Ad_a \ds b \\
+   \end{align}
+
+
+** Powers
+
+   \[ \dd a^2.\dd a = \dd a.a + a.\dd a \]
+
+   Therefore, in body coordinates:
+
+   \begin{align}
+   \db a^2.\dd a &= \inv{a}.\block{ \dd a + Ad_\inv{a}.\dd a} \\
+   &=  \inv{a}.\block{ I + Ad_\inv{a} }.\dd a \\
+   \end{align}
+
+   Then:
+   
+   \begin{align}
+   \db a^2.\db a &= \inv{a}.\block{ I + Ad_\inv{a} }.a.\db a \\
+   &= \block{ I + Ad_\inv{a}}.\db a \\
+   \end{align}
+   
+   In spatial coordinates:
+
+   \begin{align}
+   \ds a^2.\dd a &= \block{ \dd a + Ad_a.\dd a}.\inv{a} \\
+   &= \block{ I + Ad_a }.\dd a.\inv{a} \\
+   &= \block{ I + Ad_a }.\ds a \\
+   \end{align}
+   
+   
+   By recurrence:
+
+   \[ \db a^n. \db a  = \block{ \sum_{i=0}^{n-1} Ad_a^{-i} }.\db a \]
+
+   \[ \ds a^n. \ds a = \block{ \sum_{i=0}^{n-1} Ad_a^{i} }.\ds a \]
+   
+
+** Translations
+   
+   The product formula give: 
+
+    \begin{align}
+    \db L_g &= Id \\
+    \ds L_g &= Ad_g \\
+    \end{align}
+
+    \begin{align}
+    \db R_g &= Ad_{\inv{g}} \\
+    \ds R_g &= Id \\
+    \end{align}
+    
+** Inverse
+   
+   Differentiating the equation $a.\inv{a} = e$ using the product
+   formula above gives:
+
+   \[ \dd \inv{a} = -\inv{a}.\dd a.\inv{a} \]
+
+   Hence:
+
+   \begin{align}
+   \db \inv{a} &= -\ds a = - Ad_a \db a \\ 
+   \ds \inv{a} &= -\db a = - Ad_{\inv{a}} \ds a \\
+   \end{align}
+
+** Differences
+   
+*** Body 
+    \begin{align}
+    \db \inv{a}b &= Ad_{\inv{b}} \db \inv{a} + \db b \\
+    &= -Ad_{\inv{b}a} \db a + \db b
+    \end{align}
+    
+    \begin{align}
+    \db a \inv{b} &= Ad_b\block{ \db a - \db b } 
+    \end{align}
+    
+*** Spatial
+   \begin{align}
+   \ds \inv{a}b &= \ds \inv{a} + Ad_{\inv{a}} \ds b \\
+   &= - Ad_{\inv{a}} \ds a + Ad_{\inv{a}} \ds b \\
+   &= Ad_{\inv{a}}(\ds b - \ds a) \\
+   \end{align}
+
+   
+
+** Exponential Derivative
+
+   It can be shown that :
+
+   \[ \dd \exp(x).\dd x.\exp( -x ) = \dd x + \frac{1}{2!}[x, \dd x] + \frac{1}{3!} [x, [x, \dd x] ] + ... \]
+   
+   /cf./ [[http://en.wikipedia.org/wiki/Matrix_exponential][wikipedia]], [[http://en.wikipedia.org/wiki/Commutator][again]] and also Selig (apparently due to
+   Hausdorff).
+
+   More concretely:
+
+   \[ \ds \exp(x).\dd x = \block{ \sum_i \frac{ ad(x)^i }{ (i + 1)!} }.\dd x \]
+   
+   Therefore:
+
+   \[ I + ad(x).\ds \exp(x) = \exp \block{ ad(x) } \]
+   
+   But since we also have:
+
+   \[ Ad_{\exp x} = \exp \block{ ad(x) } \]
+   again, /cf./ [[http://en.wikipedia.org/wiki/Exponential_map][wikipedia]].
+
+   We end up with:
+
+   \[ I + ad(x).\ds \exp(x) = Ad_{\exp x} \]
+  
+   Or:
+
+   \begin{align}
+   \ds \exp(x).ad(x).\dd x &= (\exp( ad(x) ) - I).\dd x \\
+   &= \block{Ad_{\exp x} - I}.\dd x \\
+   \end{align}
+
+   Converting to body coordinates:
+   
+   \begin{align}
+   \db \exp(x).ad(x).\dd x &= Ad_{\exp -x}. \ds \exp(x).ad(x).\dd x \\
+   &= \block{ I - Ad_{\exp -x}}.\dd x \\
+   \end{align}
+
+   Computing the exponential derivative can be done by projecting $\dd
+   x$ over the image, and parallel to the kernel, of $ad(x)$:
+   
+   \[ \dd x = \dd x^{Im} + \dd x^{Ker} \]
+   
+   The Hausdorff formula implies that:
+
+   \[ \ds \exp(x).\dd x^{Ker} = \dd x^{Ker} \]
+
+   And, by construction: 
+
+   \[ \exists \dd y \in \mathfrak{g}, \quad \dd x^{Im} = ad(x).\dd y \]
+
+   Thus:
+
+   \[ \ds \exp(x).\dd x = \dd x^{Ker} \, + \, \block{Ad_{\exp x} - I}.\dd y  \]
+   
+   So we see that in the general case, computing the derivative of
+   $\exp(x)$ reduces to the problem of projecting on $Im(ad(x))$
+   parallel to $Ker( ad(x) )$.
+
+   The body-fixed derivative is:
+
+   \begin{align}
+   \db \exp(x).\dd x &= Ad_{\exp -x} \db \exp(x).\dd x  \\
+   &= Ad_{\exp -x}.\dd x^{Ker} + \block{ I - Ad_{\exp -x} }.\dd y \\
+   \end{align}
+   
+   TODO la [[http://www.phantag.com/?p=16002][feinte]].
+
+   Let us sum up: we start by decomposing $\mathfrak{g}$ along the
+   kernel and image of $ad(x)$:
+
+   \[ \mathfrak{g} = \Ker{ ad(x) } \oplus \Image{ ad(x)} \]
+   
+   $\ds \exp(x)$ is the identity on $\Ker{ ad(x) }$ (which is thus
+   stable). Let us call $\tilde{ad}(x)$ the (bijective) restriction of
+   $ad(x)$ to its image:
+
+   \[ \tilde{ad}(x): \mathfrak{g} \big / \Ker{ad(x)} \to \Image{ad(x)} \]
+   
+   On this subspace, we have:
+
+   \[ \ds exp(x) = \block{ Ad_{\exp(x)} - I }.\inv{\tilde{ad}(x)} \]
+
+   Again, this subspace is stable.
+
+
+** Logarithm Derivative
+
+   If we express $\dd y$ as a the result of a linear operator $P$, so that:
+
+   \begin{align}
+   \dd y &= P.\dd x \\
+   \dd x^{Ker}& = (I - ad(x)P).\dd x \\
+   \end{align}
+   
+   That is: $ad(x).P$ is the projector over the image of $ad(x)$,
+   parallel to the kernel. The above formula can then be rewritten as:
+
+   \begin{align}
+   \db \exp(x).\dd x = Ad_{\exp -x}\block{ I - ad(x)P - P}.\dd x + P.\dd x \\
+   \db \exp(x).\dd x = \block{Ad_{\exp -x}\block{ I - ad(x)P - P} + P}.\dd x \\
+   \end{align}
+
+
+--------------
+* Old stuff
+--------------
+
+* Exponential Formula
+
+Here is a simple, algebraic-only proof of the Hausdorff formula. We
+start with this simple fact, which can be easily checked from the
+above formula:
+
+\[ Ad_{\exp x}.x = x \]
+
+Taking spatial derivative in both parts:
+
+\[ \ds Ad_{\exp x}.\ds \exp(x).\dd x.x + Ad_{\exp x}.\dd x = \dd x \]
+
+But since $\ds Ad_{\exp x}.\ds \exp(x).\dd x = ad( \ds \exp(x).\dd x )$, we have:
+
+\[ ad( \ds \exp(x).\dd x ).x + Ad_{\exp x}.\dd x = \dd x \]
+
+Using the antisymmetry of the Lie bracket, we obtain that:
+
+\[ \block{ I + ad(x).\ds \exp(x) }.\dd x = Ad_{\exp x}.\dd x \]
+
+Or:
+
+\[ I + ad(x).\ds \exp(x) = \exp\block{ad(x)} \]
+
+A similar formula can be obtained for the logarithm, starting from:
+
+\[ Ad_g.\log(g) = \log(g) \]
+
+We end up with:
+
+\[ ad\block{ \log(g) } = \block{Ad_g - I}.\ds log(g) \]
+
+* TODO Theory (Crash Course)
+
+** Basics  
+  - Lie group $G$ = smooth group: smooth manifold + smooth operations
+  - left/right translations
+  - Left-invariant vector-fields = vector space structure + lie
+    bracket, completely determined by the value of the field at the
+    identity
+    - Lie algebra = tangent space at the identity + Lie bracket
+  - Lie algebra $\iff$ Lie group through $\exp/\log$
+
+** Adjoint
+  
+  - Inner automorphism: $G \to G, \quad Aut_g.h = gh\inv{g}$
+  - Adjoint representation of the group: $Ad_g = \dd Aut_g(Id): \mathfrak{g} \to \mathfrak{g}$
+   - $Ad$ is a group representation: $Ad: G \to GL( \mathfrak{g} )$
+  - adjoint representation of the algebra: $ad = \dd Ad(Id): \mathfrak{g} \to \mathfrak{gl}( \mathfrak{g} )$
+    - turns out that $ad(x)(y) = xy - yx = [x, y]$
+
+  - gives a morphism of Lie group/algebra over "canonical" Lie
+    group/algebra $GL(\mathfrak{g})$ and $\mathfrak{gl(g)}$.
+
+  - in fact, $Aut_g(h) = h \iff gh = hg$, thus we have:
+    - $Aut = Id \iff G$ is commutative
+    - $Ad = Id$ 
+    - $ad = 0$
+    - we see how the properties of $ad$ reflect those of the original
+      group
+
+      
+   - As a summary, the following diagram commutes, where $\dd$ is the
+     left- or right-trivialized differential:
+     
+\[ 
+\begin{matrix}
+& G & \overset{Ad}{\rightarrow} & GL( \mathfrak{g} ) & \\
+\dd & \downarrow & & \downarrow & \dd \\
+& \mathfrak{g} & \overset{ad}{\rightarrow} & \mathfrak{gl}(\mathfrak{g} ) & \\
+\end{matrix}
+\]
+
+   - mwaif.
+
+
+** Classification
+   
+   - Baker-Campbell-Hausdorff formula: $\exp(x)\exp(y)$ = $\exp(
+     ... )$ where ... only involves iterated brackets between $x, y$
+     - the structure of the Lie algebra largely determines the
+       structure of the group
+   - abelian algebra: $[x, y] = 0 \iff$  abelian group
+   - nilpotent algebra (iterated bracket becomes zero after finite steps) $\iff$ nilpotent group 
+     - /e.g./ strictly triangular matrices $\iff$ unitriangular matrices
+   - solvable
+   - simple/semi-simple
+   
+
+* Tangent Bundle
+  
+  Body and spatial derivatives are the two /canonical/ ways of
+  representing a tangent vector $\dd g \in T_g G$ over the Lie algebra
+  $\mathfrak{g} = T_e G$ of the group. They are obtained using the
+  /left/ and /right/ translation differentials, which for matrix Lie
+  groups are simply given by:
+  
+  \begin{align}
+  \dd L_g (e): \mathfrak{g} \to T_g G, \quad \omega \mapsto g. \omega \\
+  \dd R_g (e): \mathfrak{g} \to T_g G, \quad \omega \mapsto \omega.g \\
+  \end{align}
+  
+  Since $g \in GL(n)$, these differentials provide isomorphisms
+  between the Lie algebra and the tangent space at any point of the
+  group. In particular, this means that the tangent bundle $TG$ is
+  globally diffeomorphic to $G \times \mathfrak{g}$, /i.e/ $G$ is a
+  parallelizable manifold.
+  
+  Note that for /commutative/ Lie groups (/e.g/ vector spaces), these
+  differentials are the identity mapping.
+
+** Adjoint
+
+   The above differentials can be used to express a tangent vector
+   over the Lie algebra:
+
+   \[ 
+   \dd g = \dd L_g.\db g = \ds g.\dd R_g 
+   \]
+
+   
+   The /adjoint/ mapping converts between body and spatial velocities:
+
+   \[ Ad_g: \mathfrak{g} \to \mathfrak{g}, \quad \db g \mapsto \ds g \]
+
+   For matrix groups, it is given by:
+
+   \[ Ad_g.\omega = g.\omega.\inv{g} \]
+   
+
+** Body/Spatial Differentials
+
+   Given a function $f: G \rightarrow H$ between Lie groups, the
+   differential $\dd f(x)$ can be expressed equivalently by means of
+   the body/spatial velocities by simply converting tangent vectors on
+   both ends of $\dd f(x)$:
+   
+   \[ \db f(x).\db x = \dd (L_{\inv{f(x)}} \circ f \circ L_{x}).\db x\] 
+   \[ \ds f(x).\ds x = \dd (R_{\inv{f(x)}} \circ f \circ R_{x}).\ds x\] 
+   
+   For matrix Lie groups, paying attention to the order of
+   composition, this gives:
+
+   \begin{align}
+   \dd f(x).\dd x &= f(x).\db f(x).x.\db x \\ 
+   &= \ds f(x).\ds x.x.f(x) \\
+   \end{align}
+   
+    For flat Lie groups, body/spatial derivatives are simply the usual
+    differential: $\dd = \db = \ds$.
+
+
+* TODO Properties
+
+** TODO Tangent Space
+   Parallelizable, body/spatial velocities
+   
+** TODO Lie Algebra
+   adjoint, bracket
+   
+   
+** Exponential
+    
+   
+
+ 

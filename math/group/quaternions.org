@@ -1,0 +1,430 @@
+Quaternions
+
+Quaternions have a long history, as can be checked on Wikipedia. They
+are primarily used as a representation of space rotations. As such,
+they turn out to be quite convenient to use in practice due to their
+compactness and nice geometric properties. Most operations on
+rotations can be expressed by means of quaternion representation,
+which often gives a much more intuitive view of the situation.
+
+#+include: ~/org/latex.org
+#+setupfile: ~/org/style.org
+
+* Construction
+
+** Complex Numbers
+   
+   We start by building the complex numbers as the real $2 \times 2$
+   matrices of the form:
+
+   \[ \mat{ 
+   x  & y  \\
+   -y & x  \\
+   } \]
+   
+   The above set is obviously a $2$-dimensional vector
+   space, whose basis is noted $(1, i)$. One can check that $i^2 = -1$.
+   
+   This space is closed under matrix multiplication, and determinants
+   show that this space, together with this (commutative)
+   multiplication, form a /field/. 
+
+#  This is known as the /Cayley-Dickinson/ construction of the complex
+#  numbers, $\CC$.
+  
+** Quaternions
+
+   We iterate this construction with matrices of the same form, but
+   now with /complex/ coefficients:
+
+   \[ \mat{ x & y \\ -\bar{y} & \bar{x} } \]
+
+   We end up with a 2-dimensional /complex/ vector-space, that is also
+   a 4-dimensional /real/ vector space, given by real $\small{4 \times
+   4}$ matrices of the form:
+   
+   \[ 
+   \mat{  
+    w &  x &  y &  z \\
+   -x &  w & -z &  y \\
+   -y &  z &  w & -x \\
+   -z & -y &  x &  w \\  
+   } 
+   \]
+
+   /(notice the $\small{2\times 2}$ complex blocks)/
+
+   This space is again closed under matrix multiplication, but the
+   multiplication is no longer commutative. Together with the matrix
+   product, this space forms the quaternions, noted $\HH$.
+   
+   
+* Basis
+
+  The above real matrix representation has the coordinates $(w, x, y,
+  z)$ in the canonical basis. The corresponding basis vectors are
+  noted $(1, i, j, k)$ and verify:
+
+  \[ i^2 = j^2 = k^2 = ijk = -1 \]
+  
+  These formula are actually sufficient to define the quaternions, and
+  were carved on /Brougham (Broom) Bridge/ in Dublin by *Hamilton*, on
+  the 16th of October 1843.
+  
+  In the remaining of this document, we will denote quaternions using
+  the following notations:
+  
+  \[ q = (w, x, y, z) = w.1 + x.i + y.j + z.k =: w + n \]
+  
+  where $n$ is a pure imaginary quaternion with coordinates $(0, x, y,
+  z)$ in the canonical basis. We will usually identify a quaternion
+  $q$ with its real coordinates $(w, x, y, z)$, and refer to its
+  matrix representation as:
+  
+  \[ \hat{q} \in \MM_{\,4,4}(\RR) \]
+  
+
+* Product 
+
+  A more compact expression of the quaternion product is fortunately
+  available. Given two quaternions $a = w_a + n_a$ and $b = w_b +
+  n_b$, the product of $a$ and $b$ is given by:
+
+  \[ ab = (w_a + n_a) (w_b + n_b) = w_a w_b - n_a^T n_b \quad + \quad w_a n_b + n_a w_b + n_a\times n_b \]
+  
+  In particular, for pure imaginary quaternions $x$ and $y$ this
+  gives:
+  
+  \[ x.y = x \times y - x^Ty \]
+  
+* Conjugation
+    
+  As for the complex numbers, this corresponds to the transpose of the
+  matrix representation:
+
+  \[ \bar{q} \simeq \hat{q}^T \]
+  
+  This immediately implies that:  
+  
+  \[ \bar{p.q} = \bar{q}.\bar{p} \]
+
+  Written in coordinates, the conjugation is given by:
+  \[ \bar{q} = w_q - n_q \]
+  
+  Real and imaginary parts of a quaternion may be expressed using
+  conjugation:
+
+  \[ w_q = \frac{q + \bar{q}}{2} \]
+  \[ n_q = \frac{q - \bar{q}}{2} \]
+
+  
+
+* Norm
+  As for the complex numbers, the conjugation induces a norm over the
+  quaternions, which coincides with the Euclidean norm on $\RR^4$:
+  
+  \[ |q|^2 = q \bar{q} = \bar{q} q = ||q||_{\RR^4}^2 \in \RR^+ \]
+
+  As for the complex numbers, the norm is multiplicative:
+
+  \[ |a.b| = |a|.|b| \]
+  
+  
+* Inverse 
+  
+  From the norm definition, a simpler expression can be derived for
+  the quaternion inverse:
+
+  \[ \inv{q} = \frac{\bar{q}}{|q|^2} \] 
+  
+* Unit Quaternions
+
+  The unit sphere $S^3 \subset \HH \simeq \RR^4$ of /unitary/
+  quaternions (/i.e./ such as $||q|| = 1$) is closed under quaternion
+  product and inverse. Thus, $S^3$ forms a Lie group for quaternion
+  multiplication: the inverse is simply conjugation in this case,
+  which is obviously smooth.
+
+  As for the unit complex numbers, any unit quaternion can be written
+  in a /polar/ form:
+
+  \[ ||q|| = 1 \Rightarrow \exists \theta \in S^1, n \in S^2 / \quad  q = \cos(\theta) + \sin(\theta).n \]
+  
+  Note that $(\theta, n)$ and $(-\theta, -n)$ represent the same
+  quaternion, so one may choose to pick the one with positive
+  $\theta$, and choose $n$ accordingly.
+  
+** TODO Derivative
+
+    Using the polar form $q = c + s.n \in S^3$, we have:
+    
+    \begin{align}
+    dq &= -s.\dd \theta + c.\dd \theta.n + s.\dd n \\
+       &= (-s + c.n).\dd \theta + s.\dd n \\
+       &= q.n.\dd \theta + s.\dd n \\
+    \end{align}
+
+    The /body-fixed/ derivative $\db q$ is thus: 
+    
+    \begin{align}
+    \db q &= \inv{q}(q.n.\dd \theta + s.\dd n ) \\
+          &= n.\dd \theta + s.(c - s.n).\dd n \\
+	  &= n.\dd \theta + s.c.\dd n - s^2.n\times \dd n \quad \in \mathfrak{s^3} \\
+    \end{align}
+    
+    where we used the fact that $n^T.\dd n = 0$ since $n \in S^2$ in
+    the last line. The last line can be expanded to obtain a more
+    intuitive geometric formula:
+    
+    \begin{align}
+    \db q &= \inv{q}(q.n.\dd \theta + s.\dd n ) \\
+          &= n.\dd \theta + s.\bar{q}.\dd n \\
+	  &= n.\dd \theta + s.R_{n, -\theta}.\dd n \\
+	  &= n.\dd \theta + \tan(\theta) \frac{\dd n + R_{n, -2\theta}.\dd n}{2} \\
+    \end{align}  
+    
+    This formula gives the decomposition of $\db q$ on $n$ and
+    $n^\bot$ to obtain, when $q \neq 1$:
+
+    \begin{align}
+    \dd \theta &= n^T.\db q \\
+    \dd n     &= R_{n,\theta}.\pi_{n^\bot}.\frac{\db q}{s} \\
+    \end{align}
+
+
+* Lie Group Structure 
+   
+  The (real) Lie group structure can be derived as a compact matrix
+  subgroup of $GL_4(\RR)$. We develop this structure using the more
+  familiar 4-coordinates.
+
+** Lie Algebra
+    
+    The Lie algebra $\mathfrak{s^3}$ is the
+    set of pure imaginary quaternions[fn:lie-algebra], identified with
+    $\RR^3$ with the cross-product[fn:lie-bracket] as Lie bracket.
+
+** Adjoint 
+    
+    Since the quaternion norm is multiplicative, the adjoint
+    representation of a unit quaternion $q \in S^3$ over its Lie
+    algebra is an orthogonal endomorphism of $\mathfrak{s^3} \simeq
+    \RR^3$: in particular its determinant is either 1 or -1.  Since
+    $S^3$ is compact and the adjoint representation is smooth, this
+    determinant must be constant over all $S^3$. Since $I = Ad_1$ has
+    determinant $1$, the adjoint representation is thus always a
+    rotation:
+
+    \[ Ad: S^3 \overset{ \small{2:1} }\longrightarrow SO(3) \]
+    
+
+    This representation is /two-to-one/: both $q$ and $-q$ represent
+    the same rotation (and only them), which is known as the /double
+    cover/ of $SO(3)$ by $S^3$. This fact gives an idea of the topology
+    of $SO(3)$: it is $S^3$ with antipodal points identified, that is
+    the real 3-dimensional projective space $\RR \PP^3$.
+
+    If $q = \cos(\frac{\theta}{2}) + \sin(\frac{\theta}{2}).n$, then $q$
+    represents the rotation of axis $n$ and angle $\theta$.
+    
+** Exponential
+
+   Similarly to the complex numbers, the polar form of a unit
+   quaternion can be expressed using the exponential power series:
+
+   \[ q = \cos(\theta) + \sin(\theta).n = \exp(\theta.n) \]
+   
+   The proof immediately follows from the exponential power series
+   definition, noticing that $n^2 = -1$. Given a Lie algebra element
+   $x \in \mathfrak{s^3}$, the quaternion exponential is given by:
+
+   \begin{align*}
+   \exp(x) &= \cos ||x|| + \sin ||x||.n \\
+   \end{align*}
+   
+   where $x = ||x||.n$, with $||n|| = 1$. 
+   
+*** Derivative
+    
+    In terms of some *non-zero* Lie algebra element $x \in
+    \mathfrak{s^3}$, we have:
+
+    \[ (\theta, n) = \left(||x||, \frac{x}{||x||} \right) \]
+
+    [[./differential-geometry.org][Therefore:]]
+
+    \begin{align*}
+    \dd \theta &= n^T.\dd x \\
+    \dd n &= \frac{1}{||x||} \pi_{x^\bot} \dd x \\
+    \end{align*}
+    
+    The polar form above gives the differential formula in terms of
+    $\dd \theta$ and $\dd n$:
+
+    \[ \db (c + s.n)(\dd \theta, \dd n) =  n.\dd \theta + s.c.\dd n - s^2.n\times \dd n \]
+
+    This formula can be used to compute the derivative by first
+    converting $\dd x \mapsto (\dd \theta, \dd n)$. With a bit of
+    algebra, a $\dd x$-only formula for the exponential body-fixed
+    derivative can be obtained:
+    
+    \begin{align} \db \exp(x).\dd x &= \dd x + (\sinc(\theta)
+    \cos(\theta) - 1).\pi_{x^\bot} \dd x - \sinc(\theta)^2 .x \times
+    \pi_{x^\bot} \dd x \\
+
+    &= \dd x + (\sinc(\theta) \cos(\theta) - 1).\pi_{x^\bot} \dd x -
+    \sinc(\theta)^2 .x \times \dd x
+    \end{align}
+    
+
+
+*** Second Derivative
+
+    We start over at: 
+
+    \[ \db (c + s.n)(\dd \theta_1, \dd n_1) =  n.\dd \theta_1 + s.c.\dd n_1 - s^2.n\times \dd n_1 \]
+    
+    Thus:
+
+    \begin{align}
+    \dd (\db \exp(x).\dd x_1).\dd x_2 &=  \dd \block{\db \exp(x).(\dd \theta_1, \dd n_1)}. \block{\dd \theta_2, \dd n_2} \\
+    
+    &=  \dd n_2.\dd \theta_1 + \block{c^2 - s^2}.\dd \theta_2.\dd n_1 - \block{2sc.\dd \theta_2 n + s^2 \dd n_2} \times \dd n_1 \\
+    
+    &= \dd n_2.\dd \theta_1 -s^2 \dd n_2 \times \dd n_1 + \cos(2\theta).\dd \theta_2.\dd n_1 - \sin(2\theta).n\times \dd \theta_2 \dd n_1 \\
+    &= \dd n_2.\dd \theta_1 -s^2 \dd n_2 \times \dd n_1 + \exp(-2x).\dd\theta_2.\dd n_1 
+    \end{align}
+   
+** Logarithm
+
+    In the same spirit, given a unit quaternion $q = w + v =
+    \cos(\theta) + \sin(\theta).n$, the logarithm is defined (when
+    relevant) as :
+
+    \[ \log q = \theta n \]
+    
+    If we limit ourselves to quaternions in the /real, positive
+    hemisphere/ [fn:hemisphere], both $(\theta, n)$ and $(-\theta, -n)$
+    represent the same quaternion. Hence we may choose the keep only the
+    one with positive $\theta$ and flip the $n$ when needed. Under this
+    choice, $\sin \theta \geq 0$, so we may get $n$ simply by
+    normalizing the vector part. \theta is obtained using $\inv{\cos}$.
+    
+    In practice, this gives:
+
+    \begin{align*}
+    \theta &= \inv{\cos}(w) \\ 
+    n &= \frac{v}{||v||} \\
+    \end{align*}
+
+    
+*** Derivative
+    
+    Since $\dd \inv{\cos}(x).\dd x = -\frac{\dd x}{\sqrt{1 - x^2} }$,
+    the $\log$ derivative at $(\theta, n)$ is:
+
+    \begin{align*}
+    \dd \log (q).\dd q &= \dd \theta.n + \theta.\dd n \\
+    &=  -\frac{\dd w}{\sqrt{1 - w^2}}n + \frac{\theta}{||v||} \pi_{v^\bot}.\dd v  \\
+    \end{align*}
+    
+    We may notice that $\sqrt{1 - w^2} = \sqrt{ \sin^2 (\theta) } =
+    \sin(\theta) = ||v||$ since $\sin(\theta) \geq 0$, thus:
+
+    \[ 
+    \dd \log (q).\dd q = \frac{1}{||v||} \block{ \theta.\pi_{v^\bot}.\dd v -n.\dd w }
+    \]
+
+    If we need the /body-fixed/ derivative, we need to express $\dd w$
+    and $\dd v$ in terms of the body velocity $\db q$: 
+
+  
+    \begin{align*}
+    \dd q &= \dd w + \dd v = q. \db q = (w + v).\db q \\ 
+          &= \underbrace{-v^T \db q}_{\dd w} \quad + \quad \underbrace{w.\db q + v \times \db q}_{\dd v} \\
+    \end{align*}
+
+
+    where we expanded pure imaginary quaternion product $v.\db q$ in the
+    last line. The final value for $\dd \log$ is obtained with the
+    chain-rule:
+
+    \begin{align}
+    \dd \log (q).\dd q &= \frac{1}{||v||} \block{\theta.\pi_{v^\bot}.\block{w.\db q + v \times \db q}  + n.v^T \db q } \\
+    &= \theta n \times \db q + n.n^T \db q + \frac{\theta}{||v||} \pi_{v^\bot}.w.\db q \\
+    \db \log(q).\db q &=  n.n^T \db q + \log(q) \times \db q + \frac{\theta}{\tan(\theta)} \pi_{n^\bot}.\db q \\
+     &= \db q + \log(q) \times \db q + \block{\frac{\theta}{\tan(\theta)} - 1} \pi_{n^\bot}.\db q \\
+   
+     &= 
+     \end{align}
+
+    As expected, this is the same formula as for $SE(3)$ [fn:bullo95]
+    up to a factor $\frac{1}{2}$. The term
+    $\frac{\theta}{\tan(\theta)}$ may be computed using
+    $\frac{\cos(\theta)}{\sinc(\theta)}$ for better numerical
+    stability.
+    
+* TODO Riemannian Structure
+
+  Since $S^3$ is compact, is has a bi-invariant Riemannian metric. The
+  Riemannian and Lie exponential coincide, meaning the group
+  exponential gives geodesics.
+ 
+* Cayley Transform
+
+  The Cayley map, or Cayley transform, provides an alternative mapping
+  from the Lie algebra to a Lie group for certain matrix groups. It is
+  desirable in computationally-intensive situations as it is cheaper
+  to compute than the group exponential. While usually defined on
+  $SO(3), SE(3)$, its definition can be adapted to unit quaternions:
+  
+  \[ Cay(x) = \frac{1 + x}{1 - x} \]
+  
+  for some pure imaginary quaternion $x \in \mathfrak{s^3}$. The
+  quotient notation emphasizes the commutativity. With a bit of
+  algebra, the Cayley map has an intuitive interpretation:
+
+  \begin{align}
+  Cay(x) &= \frac{1 + x}{1 - x} \\
+         &= \frac{ (1+x)^2 }{ ||1 + x ||^2 } \\
+	 &= \left( \frac{1 + x}{||1 + x||} \right)^2 \\
+  \end{align}
+
+  Geometrically, this corresponds to:
+
+  1. Start from the identity $1$
+  2. Move to $x$ in the tangent space at the identity
+  3. Normalize the result: this brings us back to the upper hemisphere
+     of $S^3$
+  4. Go twice as far from the identity along the same /geodesic/: this
+     covers all of $S^3$, except $-1$
+
+# footnotes 
+    
+[fn:lie-algebra] The normal to $S^3$ at $1$ is $1$. Tangent vectors
+orthogonal to $1$ are thus pure imaginary.
+
+[fn:lie-bracket] Vector cross-product can be expressed using (pure
+imaginary) quaternion commutator
+
+[fn:hemisphere] We restrict to rotations with angle $-\pi \lt \theta
+\lt \pi$, the quaternion angle $\frac{\theta}{2}$ verifies $w = \cos
+\frac{\theta}{2} \geq 0$
+
+[fn:bullo95] /Proportional Derivative (PD) Control On The Euclidean
+Group/ - *F. Bullo , R. M. Murray* - European Control Conference, 1995.
+ 
+
+* From two vectors
+	
+	To get a quaternion corresponding to the rotation between two
+	vectors $x, y \in \RR^3$, we first notice that:
+
+	1. $x^T y = \norm{x}\norm{y} \cos \theta$
+	2. $x \wedge y = n\sin \theta$
+	3. We actually need $q = \cos \frac{\theta}{2} + n.\sin \frac{\theta}{2}$
+	4. As pure quaternions, $x.y = x \wedge y - x^T y$
+
+  So if we choose $q = \frac{r}{\norm{r}}$, where $r = \block{x + y}.x$ we should be just fine, right ?
+		 
+	

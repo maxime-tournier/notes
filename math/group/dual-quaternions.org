@@ -1,0 +1,291 @@
+Dual Quaternions
+
+Just when you thought usual [[file:quaternions.org][quaternions]] were easy to grasp: here come
+/dual/ quaternions. They roughly allow to represent [[file:se3.org][rigid
+transformations]] pretty much the same way usual quaternion represent
+rotations. Most of these developments are taken from [fn:kavan].
+
+#+setupfile: ~/org/style.org
+#+include: ~/org/latex.org
+
+* Definition
+
+  Dual quaternions are dual numbers over quaternions. This means we
+  have a new algebraic constant $\epsilon$ which satisfies: 
+
+  \[ \epsilon^2 = 0 \]
+
+  A dual quaternion is thus represented by a /real/ and a /dual/
+  quaternion: 
+
+  \[ q = q_0 + \epsilon q_\epsilon \]
+
+  It is equivalent to think of a dual quaternion as a quaternion with
+  dual number coefficients, since all the imaginary units $\epsilon,
+  i, j$ and $k$ commute.
+
+
+* Operations
+** Product 
+  
+   \begin{align*}
+   a.b &= (a_0 + \epsilon a_\epsilon).(b_0 + \epsilon b_\epsilon) \\
+       &= a_0.b_0 + \epsilon(a_0.b_\epsilon + a_\epsilon.b_0) \\
+   \end{align*}
+   
+   Note that the dual part looks strangely similar to the differential
+   of product formula.
+
+** Inverse
+
+  From the product formula, the dual inverse is given, when defined,
+  by:
+
+  \begin{align}
+  (\inv{q})_0 &= \inv{(q_0)} \\
+  (\inv{q})_\epsilon &= -\inv{q_0}q_\epsilon\inv{q_0} \\
+  \end{align}
+
+  Again, the dual part looks strangely similar to the differential of
+  the inverse formula.
+
+** TODO Square Root
+
+
+  
+* Conjugate
+  
+  There are now three flavors of conjugation, whether we conjugate
+  in the quaternion sense, in the dual sense or both. 
+
+** Quaternion Conjugate
+   
+   \[ q^* = q_0^* + \epsilon q_\epsilon^* \]
+
+** Dual Conjugate
+
+   \[ \bar{q} = q_0 - \epsilon q_\epsilon \]
+   
+** Double Conjugate
+   
+  Fortunately, these two conjugation operators commute, so that:
+
+  \[ \bar{ q^* } = \bar{q}^* \] 
+  
+* (Semi) Norm
+
+  The quaternion conjugate induces a norm on dual quaternions, defined
+  as in the quaternion case as:
+
+  \[ ||q||^2 = q^*.q = q.q^* \]
+
+  ...except this time the norm is a dual number. A simpler expression
+  might be used for computations, when the real part is non-zero:
+  
+  \[ ||q|| = ||q_0|| + \epsilon \frac{ \inner{q_0}{q_\epsilon} } {||q_0||} \]
+
+  The inverse can also be expressed in terms of the norm, when
+  defined, by:
+  
+  \[ \inv{q} = \frac{q^*}{||q||^2} \]
+  
+  It is actually a /semi-norm/ since the separation[fn:separation]
+  axiom does not hold: any dual quaternion with zero real part has a
+  zero norm, whatever the dual part.
+
+* Unitary Dual Quaternions
+  
+  We call /unitary/ dual quaternions the ones with unit norm:
+  $\norm{g} = 1$. It can be shown[fn:kavan] that any unitary dual
+  quaternion can be /uniquely/ decomposed as:
+
+  \[ g = q + \epsilon t.q \]
+
+  where $q \in S^3$ is a unitary quaternion, and $t \in
+  \mathfrak{s^3}$ is a pure imaginary quaternion (/i.e./ a
+  3-vector). 
+
+  This decomposition actually provides a group morphism from dual
+  quaternions to rigid transforms, which is a two-to-one
+  correspondence: due to the so-called /double covering/ of rotations
+  by unitary quaternions, both $g$ and $-g$ represent the same rigid
+  transform (so it is again a double covering).
+
+  The action of rigid transforms on 3-vectors can be expressed by
+  representing 3-vectors with equivalent translations. For $g \simeq
+  (R, t) \in SE(3)$ we have:
+
+  \[ g(x) = Rx + t \simeq g.( 1 + \epsilon x).\bar{g^*} \]
+
+  The right multiplication by $\bar{g^*}$ extracts the translational
+  part from $g.( 1 + \epsilon x)$.
+
+** Synthetic Differential Geometry
+
+  The above decompostion of unitary quaternions provides a morphism
+  between a unitary dual quaternion and a unitary quaternion tangent
+  vector. If we let $\dd q \in T_q S^3$ be such a tangent vector, then
+  the following dual quaternion:
+
+  \[ q + \epsilon \dd q \]
+
+  is unitary. In fact, the dual number algebraic rule $\epsilon^2 = 0$
+  can be seen as a special calculus rule for tangent vectors,
+  enforcing that anything /second-order/ cancels out (see the product
+  and inverse examples above). The theory behind this is called
+  /synthetic differential geometry/ and is the subject of recent
+  developments.
+
+  Under this light, rigid transformations can be seen as rotation
+  tangent vectors. This is similar to consider the /tangent/ Lie group
+  of $S^3$.
+
+* Lie Group Structure
+
+  Unitary dual quaternions form a [[file:lie-groups.org][Lie group]] under multiplication. The
+  inverse is given by the quaternion conjugate, which is clearly
+  smooth.
+
+** Lie Algebra
+   
+   Deriving unitary dual quaternions $g = q + \epsilon t q$ at the
+   identity easily shows that the Lie algebra is given by pure
+   imaginary dual quaternions:
+
+   \[ \omega + \epsilon v \]
+
+   where $\omega, v \in \mathfrak{s^3}$ are two pure imaginary
+   quaternions (3-vectors). Given any unit dual quaternion $g = q +
+   \epsilon t q$, we can give an intuitive interpretation of the
+   body-fixed velocity $\omega + \epsilon v$:
+
+   \begin{align} 
+   \dd g &= \dd q + \epsilon (\dd t\ q + q\ \dd t) \\
+   &= (q + \epsilon tq)(\omega + \epsilon v) \\
+   &= q\omega + \epsilon \block{ tq\omega + qv } \\
+   \end{align}
+   
+   It follows that:
+
+   \begin{align}
+   \omega &= \db q \\
+   v &= Ad_{\inv{q}} ( \dd t ) \\
+   \end{align}
+
+   which makes $(\omega, v)$ half the body-fixed velocity of the
+   corresponding $SE(3)$ tangent vector.
+
+** Adjoint 
+   
+   It is the same as for [[file:se3.org::*Adjoint][rigid transformations]]. More precisely, for $g
+   \simeq (R, t) \in SE(3)$ the adjoint is:
+   
+   \[ Ad_g \mat{\omega \\ v} =  \mat{ R \omega \\ t\times R\omega + R v } \]
+   
+** Exponential 
+   From the above considerations on synthetic differential geometry,
+   and since the exponential is a power series, we must have:
+
+   \[ \exp( x + \epsilon y ) = \exp(x) + \epsilon \dd\exp(x).y \]
+
+	 In particular, the rotation part is $\exp(x)$, while the translation
+	 part is $\ds \exp(x).y$. See [[file:quaternions.org][quaternions]] page for the exact
+	 formula.
+	 
+*** TODO Derivative
+    
+    From the above formula, we have:
+
+    \begin{align}
+    \dd \exp( x + \epsilon y )(\dd x, \dd y) &= \dd \exp(x).\dd x + \epsilon \left( \dd^2 \exp(x).\dd x.y + \dd \exp(x).\dd y \right) \\
+    &= \dd \exp(x).(\dd x + \epsilon \dd y) \quad + \quad \epsilon \dd^2 \exp(x).\dd x.y 
+    \end{align}
+
+    The body-fixed derivative is thus:
+
+    \begin{align}
+    \db \exp(x + \epsilon y)(\dd x, \dd y) &= \inv{ \block{ \exp(x) + \epsilon \dd\exp(x).y } } \dd \exp( x + \epsilon y )(\dd x, \dd y) \\
+    &= \block{ \exp(x) + \epsilon \dd\exp(x).y }^* \block{\dd \exp(x).(\dd x + \epsilon \dd y) \quad + \quad \epsilon \dd^2 \exp(x).\dd x.y } \\
+    &= \underbrace{\db \exp(x)(\dd x + \epsilon \dd y)}_A + 
+    \epsilon \block{ \underbrace{\block{\dd\exp(x).y}^* \dd \exp(x).\dd x}_B + 
+    \underbrace{\exp(x)^*  \dd^2 \exp(x).\dd x.y}_C } \\
+    &= (hurrrr !)
+    \end{align}
+   
+    $A$ simply comes from the quaternion exponential derivative, but
+    $B$ and $C$ are more involved:
+
+    \begin{align}
+    B &= \block{\dd\exp(x).y}^* \dd \exp(x).\dd x \\
+    &= \block{\exp(x) \db \exp(x).y}^*  \dd \exp(x).\dd x \\
+    &= (\db \exp(x).y)^* \exp(x)^* \dd \exp(x).\dd x \\
+    &= -\block{\db \exp(x).y} \block{\db \exp(x).\dd x}
+    \end{align}
+
+    since $\db \exp(x).y \in \mathfrak{s^3}$ in the last line. At this
+    point we can notice that the /real/ part of $B$ should cancel out
+    with the one from $C$ since we are dealing with a body-fixed
+    derivative. Now for the nasty part:
+
+    \begin{align}
+    C &= \exp(x)^* \dd \block{ \dd \exp(x).y }.\dd x  \\
+    &= \exp(x)^* \dd \block{ \exp(x). \db \exp(x).y }.\dd x  \\
+    & = \exp(x)^* \block{  \block{\dd \exp(x).\dd x}\block{\db \exp(x).y} + 
+    \exp(x) \dd \block{ \db \exp(x).y }.\dd x } \\
+    &= \block{\db \exp(x).\dd x} \block{ \db \exp(x).y } +
+     \dd \block{ \db \exp(x).y }.\dd x  \\
+     &= B + \dd \block{ \db \exp(x).y }.\dd x \\ 
+    \end{align}
+
+    Much better indeed ! 
+
+    \[ \db \exp(x + \epsilon y)(\dd x, \dd y) = \db \exp(x)(\dd x + \epsilon \dd y) + 
+    \epsilon \dd \block{ \db \exp(x).y }.\dd x \]
+
+    
+** Logarithm
+
+   Again, we have:
+
+    \[ \log( q + \epsilon r ) = \log(q) + \epsilon \dd \log(q).r \]
+
+    If we left-trivialize $r$ as $r = q t$, this gives: 
+    \[ \log( q + \epsilon qt ) = \log(q) + \epsilon \db \log(q).t \]
+
+		It might be more practical to use right-trivialization $r = t q$
+		instead, as it uses the translation part directly:
+		
+		\[ \log( q + \epsilon tq ) = \log(q) + \epsilon \ds \log(q).t \]
+
+    See the [[file:quaternions.org][quaternions]] for the corresponding formula.
+    
+*** TODO Derivative
+
+    For some tangent vector $\dd q + \epsilon \dd r = (q + \epsilon
+    r)(\omega + \epsilon v)$, we have:
+
+    \begin{align}
+    
+    \dd \log( q + \epsilon r )(\dd q, \dd r) &= \dd \log(q).\block{\dd q + \epsilon \dd r} + 
+    \epsilon  \dd \block{\dd\log(q).r}.\dd q \\
+    &= \dd \log(q).\block{q \omega + \epsilon \block{r \omega + q v} } + 
+    \epsilon \dd \block{\dd\log(q).r}.\dd q \\
+    \end{align}
+
+    Like for the exponential, the (not so) fun part is the computation
+    of $\dd \block{\dd\log(q).r}.\dd q$. We first decompose $r$ as $r =
+    qt$, which gives:
+
+    \[ \dd \block{\dd\log(q).r}.\dd q = \dd \block{ \db \log(q).t }.\dd q \]
+    
+
+    
+* Footnotes
+
+[fn:kavan] [[http://isg.cs.tcd.ie/projects/DualQuaternions/][/Geometric Skinning with Approximate Dual Quaternion
+Blending/]] - *Ladislav Kavan, Steven Collins, Jiri Zara, Carol
+O'Sullivan* - ACM Transaction on Graphics, 27(4), 2008.
+
+[fn:separation] Separation axiom for a norm: $||v|| = 0 \quad \Rightarrow \quad  v = 0$
+
+ 

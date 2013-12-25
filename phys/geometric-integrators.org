@@ -1,0 +1,375 @@
+Geometric Integrators
+
+There has been a recent, growing interest in the field of /geometric/
+integrators, /i.e/ which preserve certain interesting symmetries
+(usually invariants) of the exact flows they integrate. In particular,
+Lagrangian and Hamiltonian flows arising in classical mechanics are
+*symplectic*, meaning they preserve the canonical volume form over the
+phase space. Integrators that preserve this property are known to
+exhibit particularly good energy behavior, allowing for larger time
+steps, thus making them highly relevant in a computer animation
+context.
+    
+Well-known symplectic/geometric integrators include *Sympectic Euler*  
+and *Verlet*, as well as a few others. Instead of finding a symplectic
+integrator for the Euler-Lagrange differential equations with desired
+accuracy, which can be difficult, people at Caltech (Marsden and
+colleagues [fn:1] [fn:2]) proposed a much more systematic way to
+design geometric integrators with desired order of accuracy, by
+discretizing an equivalent variational principle. Applying variations
+to the discretized (and thus approximate) principle directly produces
+a symplectic integrator.
+
+This document provides some (hopefully exact) details on the
+derivations. 
+   
+#+setupfile: ~/org/style.org
+#+include: ~/org/latex.org
+       
+* Variational Formulation
+  It is well-known that the Lagrange equations of motion can be derived
+  from the /Hamilton principle/, stating that the action of the Lagrangian
+  is stationary between two fixed end-points of the trajectory:
+  
+  \[ \delta S(q) = \delta \int_{0}^T \LL(q, \dot{q}).dt = 0 \]
+  
+  Marsden /et al./ showed that when the action is /discretized/ using
+  a /quadrature/ rule only involving values of $q$ and $v$ at the time
+  samples, then the above Hamilton principle actually /defines/ a
+  symplectic integrator. So instead of finding an accurate and
+  symplectic integrator for the Lagrange equations, the problem is
+  reduced to finding an accurate, discrete approximation of the
+  action.
+
+* Hamilton-Pontryagin Principle
+  The Hamiltonian reformulation of Lagrangian dynamics results in
+  first-order differential equations, instead of second-order ones
+  (twice as much though) using Lagrange equations. However, the
+  Hamiltonian formulation is sometimes difficult to use in practice
+  since non-trivial change of variables are needed (the /Legendre
+  transform/ for the momentum).
+
+  Marsden /et al./ proposed to combine the Lagrangian and Hamiltonian
+  formulations into a unifying variational principle, named the
+  *Hamilton-Pontryagin* principle:
+
+  \[ \delta \int_0^T \LL(q, v) + p^T(\dot{q} - v).dt = 0 \] 
+
+  This principle results in both Hamilton and Lagrange equations. One
+  appealing side of it is that the momentum is here interpreted as
+  Lagrange multipliers, enforcing the constraint $\dot{q} = v$ on these
+  /a priori/ independent variables. It thus removes the need to
+  compute complicate total derivatives in $\dot{q}$.
+  
+* Geometric Integrators
+  
+  We will develop the derivation of a simple geometric integrator
+  based on the following /quadrature/ of the Lagrangian:
+
+  \[ \int_{t_k}^{t_{k+1}} \LL(q, v) dt \approx h.\LL(q_k, v_{k+1}) =: L^d(q_k, v_{k+1}) \]
+  
+  As can be seen from its variables, such quadrature is explicit in
+  position and implicit in velocities. We apply the
+  Hamilton-Pontryagin principle to obtain the following /discrete/
+  variational principle:
+
+
+  \begin{align*}
+  \delta \int_0^T \LL(q, v) + p^T(\dot{q} - v).dt & \approx  
+  \delta \sum_{k=0}^{n} L^d(q_k, v_{k+1}) +  h.p_{k+1}^T \left(\frac{q_{k+1}-q_k}{h} - v_{k+1} \right) \\
+   & = 0 \\
+  \end{align*}
+  
+  The discrete action is a functional on $q, v, p$, whose value only
+  depends on values at the time samples. We will now express the
+  stationarity condition by taking variations of the discrete action.
+  
+** Momentum 
+   Quite simple. Taking variations in $p$ gives:
+
+   \[ h \sum_{k=0}^n \left(\frac{q_{k+1}-q_k}{h} - 
+   v_{k+1}\right)^T \delta p_{k+1}  = 0 \]
+
+   This must hold for all $n$, so each of the terms in the sum is
+   zero, thus:
+
+   \[ \delta p: \quad q_{k+1} - q_k = h.v_{k+1} \]
+   
+** Velocity
+   More complicated. Taking variations in $v$ gives:
+
+   \[ \delta v: \quad \ddd{L^d}{v}(q_k, v_{k+1}) - h.p_{k+1}^T = 0 \]
+   
+** Position
+   The tricky one. Taking variations in $q$, fixing
+   endpoints[fn:variations], gives:
+
+   \[ \sum_{k=0}^n \ddd{L^d}{q}(q_k, v_{k+1}).\delta q_k +
+   p_{k+1}^T(\delta q_{k+1} - \delta q_k) = 0\]
+   
+   Rearrange terms:
+   
+   \[ \sum_{k=0}^n \left( \ddd{L^d}{q}(q_k, v_{k+1}) - p_{k+1}^T \right).\delta q_k +  
+   \sum_{k=0}^n p_{k+1}^T \delta q_{k+1} = 0\]
+
+   Almost there, shift indices:
+
+   \[ \sum_{k=0}^n \left( \ddd{L^d}{q}(q_k, v_{k+1}) - p_{k+1}^T \right).\delta q_k +  
+   \sum_{k=1}^{n+1} p_{k}^T \delta q_{k} = 0 \]
+ 
+   Noting that $\delta q_0 = \delta q_{n+1} = 0$, we end up with:
+
+   \[ \delta q: \quad \ddd{L^d}{q}(q_k, v_{k+1}) = (p_{k+1} - p_k)^T \]
+    
+
+* Solving$^\star$
+
+  Mixing the position and velocity equations, isolating $h.p_{k+1}$,
+  gives:
+
+  @<div class="important">
+  \[ \ddd{L^d}{v} \block{q_k, v_{k+1}} = h \block{ p_k^T \quad + \quad \ddd{L^d}{q}\block{q_k, v_{k+1}} }  \]
+  @</div>
+  
+  In general, this equation is non-linear in $v_{k+1}$ and requires
+  some non-linear root-solving algorithm. In some cases though[fn:1],
+  it can be reformulated as a function minimization. 
+
+  For a kinetic-only Lagrangian: $\LL(q, v) = K(q, v) = \frac{1}{2}v^T
+  M(q) v$, with $M(q)$ being symmetric, positive, definite, we have:
+
+  \[ 
+  \begin{align*}
+
+  \ddd{L^d}{v}(q_k, v_{k+1}) & = h.v_{k+1}^T M(q_k)  \\
+  \ddd{L^d}{q}(q_k, v_{k+1}) & = h.\nabla_q K(q_k, v_{k+1}) \\
+  
+  \end{align*}
+  \]
+
+  The final integrator is thus:
+
+  \[ 
+  \begin{align*}
+  M(q_k) v_{k+1} & = h.\left( p_k + \nabla_q K(q_k, v_{k+1}) \right) = h.p_{k+1} \\
+  q_{k+1} & = q_k + h.v_{k+1} \\
+   \end{align*}
+  \]
+
+  ...which is good ol' symplectic Euler.
+
+* Forcing
+  
+  It is possible to include external forces (usually,
+  dissipation[fn:dissipation] ) through the d'Alembert principle:
+  
+  \[ \delta \int_0^T \LL(q, v) + p^T(\dot{q} - v).dt  + 
+  \int_0^T F(q, v)^T.\delta q.dt = 0 \]
+
+  where $F(q, v)$ is the external force function. A quadrature for the
+  second term can be:
+  
+  \[ \int_0^T F(q, v)^T.\delta q.dt \approx h.\sum_{k=0}^N f_{k+\alpha}^T.\delta q_{k+\alpha} \] 
+
+  where $\alpha \in [0, 1]$ defines where the forcing is applied,
+  usually $\alpha \in {0,\half,1}$. For $\alpha = 0$, the position
+  variation becomes:
+
+  \[ \delta q: \quad \ddd{L^d}{q}(q_k, v_{k+1}) + h.f_k^T = (p_{k+1} - p_k)^T \]
+  
+
+* Lie Groups$^\star$
+
+  The discrete Hamilton-Pontryagin principle can be formulated in the
+  context of a Lie group configuration space[fn:2]. Letting $\tau: G
+  \rightarrow \mathfrak{g}$ be a group difference map (usually the
+  logarithm), we have:
+
+  \[ \delta \sum_0^N L^d(g_k, v_{k+1}) + p_{k+1}^T\block{\tau \block{ \inv{g_k}g_{k+1}} - h.v_{k+1} } = 0 \]
+  
+  where $v_{k+1} \in \mathfrak{g}$ is the body velocity, and $p_{k+1}
+  \in \mathfrak{g}^*$ is the body momentum, abusing the notation
+  $p_{k+1}^T v_{k+1}$ for the natural pairing between the Lie
+  algebra and coalgebra.
+  
+
+  Actually, one can get slightly simpler final equations by expressing
+  the difference map starting at $g_{k+1}$ (notice the sneaky minus sign):
+
+  \[ \delta \sum_0^N L^d(g_k, v_{k+1}) - p_{k+1}^T\block{ \tau \block{ \inv{g_{k+1}} g_k} + h.v_{k+1} } = 0 \]
+  
+  Taking variations in the above gives the following results:
+
+  \[ \delta p: \quad \tau(\inv{g_k}g_{k+1}) = h.v_{k+1} \in \mathfrak{g} \]
+  \[ \delta v: \quad \ddd{L^d}{v}(g_k, v_{k+1}) = h.p_{k+1}^T \in \mathfrak{g}^* \]
+  
+  For variations in $g$, it gets a little bit more
+  complicated. Letting $d_{k+1} = \inv{g_k} g_{k+1}$, we have:
+
+  \[ \db \inv{d_{k+1}} = \db g_k - Ad_{d_{k+1}} \db g_{k+1} \]
+  
+  Taking /body-fixed/ variations in $g$ thus gives:
+
+  \[ \delta^b g: \quad \sum_0^N \ddd{L^d}{g}(g_k, v_{k+1}).\delta^b g_k \quad - p_{k+1}^T.\db \tau_\inv{d_{k+1}}.
+  \block{ \db g_k - Ad_{d_{k+1}} \db g_{k+1} } = 0 \]
+
+  After the little terms-rearranging dance seen above for the
+  Euclidean case, we arrive at:
+
+  \[ \ddd{L^d}{g}(g_k, v_{k+1}) \quad + \quad p_k^T \db \tau_{\inv{d_k}} Ad_{d_k} = p_{k+1}^T \db \tau_{\inv{d_{k+1}}} \] 
+
+  In other words:
+
+  @<div class="important">
+  \[ p_{k+1} = \db \tau_{\inv{d_{k+1}}}^{-T} \block{Ad_{d_k}^T \db \tau_{\inv{d_k}}^T p_k  \quad + \quad \nabla_g^b L^d(g_k, v_{k+1}) } \]
+  @</div>
+
+  We see two frame changes happening here: one gets $p_k$ to a frame
+  suitable for summing with the Lagrangian force, and the result gets
+  pulled in the right frame for equating $p_{k+1}$.
+
+  
+** Forcing
+
+   As in the linear case, adding explicit ($\alpha = 0$), external
+   forces $f_k$ results in the following position variation:
+
+   \[ \delta^b q: \quad \ddd{^b L^d}{g}(g_k, v_{k+1}) + h.f^s_k.Ad_{g_k} = 
+   p_{k+1}^T \ds \tau(d_{k+1}) - p_{k}^T\db \tau(d_{k}) \in \mathfrak{g}^* \]
+   
+   And finally:
+
+   \[ \delta^b q: \quad \ddd{^b L^d}{g}(g_k, v_{k+1}) + h.f^b_k = 
+   p_{k+1}^T \ds \tau(d_{k+1}) - p_{k}^T\db \tau(d_{k}) \in \mathfrak{g}^* \]
+
+   So we end up adding the external impulse $h.f^b_k$ to the potential/inertia
+   impulse $h.\ddd{^b \LL}{g}(g_k, v_{k+1})$.
+
+** TODO Linearization
+
+   TODO different approximation !! cf thesis.
+
+
+   For a small enough time step $h$, we may consider that $\ds
+   \tau(d_{k+1}) \approx Id$ since $\dd \log(Id) = Id$. It is also
+   possible to consider that $v_{k+1} \approx v_k$, hence we may
+   multiply the whole right-hand side of the system by:
+   
+   \[ \ds \tau^{-T}(d_{k}) = \db \tau^{-T}(d_k).Ad_{d_k}^T \]
+   
+   The kinetic energy gradient $\nabla_g^b K(g_k, v_{k+1})$ is
+   especially annoying since it contains quadratic terms
+   (Coriolis/centrifuge forces), preventing the final system from
+   being linear.
+   
+   Though it is possible to linearize this term around $(g_k, v_k)$,
+   doing so has the effect of adding a non-symmetric matrix to the  
+   mass tensor $M(q_k)$, which is generally non-desirable when solving
+   the final system (especially in the presence of contacts, since
+   many iterative algorithms rely on $M$ being PSD for
+   convergence). Therefore we propose to simply /explicit/ the kinetic
+   energy gradient by reusing its value from the previous time step:
+
+   \[ \nabla_g^b K(g_k, v_{k+1}) \approx \nabla_g^b K(g_k, v_{k}) \]
+
+   While these two steps might break symplecticity, we are left with a
+   linear system featuring a nice PSD mass matrix:
+
+   \[ M(q_k).v_{k+1} = \db \tau^T(d_{k}).p_k + h.\nabla_g^b K(g_k, v_{k}) \]
+   
+   The $\db \tau^T(d_{k}).p_k$ has a geometric interpretation: the
+   momentum at the previous time-step $p_k$ must be /pulled-back/
+   according to the (curved) geometry of the group, instead of being
+   reused directly as in the (flat) Euclidean case above.
+
+** Comparison with Euler-Lagrange equations
+
+   While all the above might seem oh-so-complicated, it should be
+   compared with the alternate, standard approach of deriving an
+   integrator based on the Euler-Lagrange equations alone:
+
+   \[ \frac{\dd}{\dd t} \ddd{\LL}{ \dot{q} } = \ddd{\LL}{q} \]
+   
+   Some remarks:
+
+   - There are many general ways to discretize these equations, but
+     none of them /a priori/ produce sympectic integrators
+   - The derivations are almost as complicated in both cases
+   - Dealing with a Lie group configuration manifold imposes using
+     successive local charts to obtain the equations, which is
+     *painful* since *second derivatives* are involved.
+
+   As a final note, we may remark that Lie group geometric integrators
+   presented here are equivalent to Euclidean geometric integrators
+   using local exponential maps.     
+     
+
+* Implicit Integrators
+
+As shown in the referenced articles, it is possible to add a
+quadrature parameter $\alpha$ controlling the /explicitness/ of the
+integrator:
+
+\[ L^d(q_k, v_{k+1}) = h.\LL(q_k + \alpha.h.v_{k+1}, v_{k+1}) \]
+
+For the case of a Lagrangian with kinetic $T$ and potential $V$
+energy, this gives:
+
+\[ \ddd{L^d}{q}(q_k, v_{k+1}).\dd q = h.\ddd{\LL}{q}(q_k + \alpha.h.v_{k+1}, v_{k+1}).\dd q \]
+
+And:
+
+\[ \ddd{L^d}{v}(q_k, v_{k+1}).\dd v = h.\alpha.h.\ddd{\LL}{q}(q_k + \alpha.h.v_{k+1}, v_{k+1}).\dd v \quad + \quad
+h.\ddd{\LL}{v}(q_k + \alpha.h.v_{k+1}, v_{k+1}).\dd v 
+\]
+
+The Hamilton-Pontryagin principle for the discrete Lagrangian gives:
+
+\[ \ddd{L^d}{v}(q_k, v_{k+1}) = h.\block{ p_k^T + \ddd{L^d}{q}(q_k, v_{k+1}) } \]
+
+Expanding:
+
+\[ \ddd{\LL}{v}(q_k + \alpha.h.v_{k+1}, v_{k+1}) + \alpha.h.\ddd{\LL}{q}(q_k + \alpha.h.v_{k+1}, v_{k+1}) = \]
+
+\[ = p_k^T + h.\ddd{\LL}{q}(q_k + \alpha.h.v_{k+1}, v_{k+1}) \]
+
+Reducing:
+
+\[ \ddd{\LL}{v}(q_k + \alpha.h.v_{k+1}, v_{k+1}) = p_k^T + h.(1 - \alpha).\ddd{\LL}{q}(q_k + \alpha.h.v_{k+1}, v_{k+1}) \]
+
+** Application: mass-string system
+
+For a mass-spring system (with constant mass matrix $M$), $\LL = T -
+V$, and we get:
+
+\[ M.v_{k+1} = p_k^T - (1-\alpha).h.\nabla_q V(x_k + \alpha.h.v_{k+1}) \]
+
+Linearizing $\nabla_q V$ around $x_k$ gives:
+
+\[ M.v_{k+1} = p_k^T - (1-\alpha).h.\block{ \nabla_q V(x_k) + h.\alpha.\nabla^2 V(x_k)v_{k+1}} \]
+
+Which is reduced to:
+
+\[ \block{M + (1-\alpha)\alpha.h^2 \nabla^2 V(x_k)}.v_{k+1} = p_k^T - (1-\alpha).h.\nabla_q V(x_k) \]
+
+For $\alpha = \half$, we obtain the system:
+
+\[ \block{M + \frac{h^2}{4} \nabla^2 V(x_k)}.v_{k+1} = p_k^T - \frac{h}{2}\nabla_q V(x_k) \]
+
+
+
+
+
+* Footnotes
+
+[fn:1] /Geometric, Variational Integrators for Computer Graphics/ -
+*L. Kharevych, Weiwei, Y. Tong, E. Kanso, J. E. Marsden, P. Schröder,
+and Mathieu Desbrun* - ACM/EG Symposium on Computer Animation 2006.
+
+[fn:2] /Lie Group Integrators for the Animation of Vehicles/ - *Marin
+Kobilarov, Keenan Crane, and Mathieu Desbrun* - ACM Transactions on Graphics, 2009.
+
+[fn:variations] That is, with: $\delta q_0 = \delta q_{n+1} = 0$
+
+[fn:dissipation] In some cases a /Rayleigh dissipation function/ can be used instead 
+

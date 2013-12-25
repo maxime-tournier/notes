@@ -1,0 +1,107 @@
+Interior Point Method
+
+#+setupfile: ~/org/style.org
+#+include: ~/org/latex.org
+
+
+* Basic Idea
+
+	The idea behind IPM is to relax the complementarity constraint
+	arising from the KKT conditions:
+
+	\begin{align}
+	 Q x + c& = A^T \lambda \\
+	\st \quad 0 \leq A x - b &\bot \   \lambda \geq 0 \\
+	\end{align}
+
+	Letting $w = Ax - b$, we require instead that:
+	
+	\[ W \lambda = \mu \]
+
+	where capitalized variables denote equivalent diagonal matrices. We
+	solve the relaxed, non-linear system using Newton's method, then
+	decrease $\mu$, and so on until convergence. In practice, we only
+	perform one newton step at each iteration.
+
+	In theory we should remain feasible at all times
+	
+
+* Equations lol
+
+** Non-linear system
+	 
+	 \begin{array}{}
+	 Qx  &- A^T \lambda &= -c  \\ 
+	 Ax  &- \mu \inv{\lambda} &= b\\
+	 \end{array}
+	 
+** Newton
+
+	 \begin{array}{}
+	 Qx  &- A^T \lambda \block{\lambda + \dd \lambda} &= -c  \\ 
+	 Ax  &+ \mu \lambda^{-2}\dd \lambda &= b + \mu \inv{\lambda} \\
+	 \end{array}
+
+	 That is:
+	 
+	 \begin{array}{}
+	 Qx  &- A^T \lambda^\star &= -c  \\ 
+	 Ax  &+ \mu \lambda^{-2} \lambda^\star &= b + 2 \mu \inv{\lambda} \\
+	 \end{array}
+
+
+	 This can be rearranged using the Schur complement:
+
+	 \[ \lambda^\star = \frac{\lambda^2}{\mu}\block{ b + 2 \mu \inv{\lambda} - Ax} \]
+
+	 Letting $\eta = \frac{\lambda^2}{\mu}$, this gives:
+
+	 \begin{align}
+	 \block{Q + A^T \eta A}x &= -c + A^T \eta \block{b + 2 \mu \inv{\lambda} } \\
+	 &=   -c + A^T \block{ \eta b + 2 \lambda }\\
+	 \end{align}
+
+	 
+	 
+
+* Equations (again)
+
+** System
+
+	\[ \mat{Qx & -A^T \lambda& \\ Ax & & -\omega \\ & \lambda \omega & } = \mat{-c \\ b \\ \mu} \]
+	
+** Newton
+
+	\[ 
+	\mat{Qx & -A^T \lambda& \\ Ax & & -\omega \\ & \bar{\omega}\lambda & + \bar{\lambda}\omega } =
+	\mat{-c \\ b \\ \mu + \bar{\lambda \omega}} 
+	\]
+	 
+	\[ 
+	\mat{Qx & -A^T \lambda& \\ -\bar{\lambda}Ax & & +\bar{\lambda}\omega \\ & \bar{\omega}\lambda & + \bar{\lambda}\omega } = 
+	\mat{-c \\ -\bar{\lambda}b \\ \mu + \bar{\lambda \omega}} 
+	\]
+
+
+	
+** Symmetric $m + n$
+	
+	\[ 
+	\mat{Qx & -A^T \lambda& \\ -\bar{\lambda}Ax & -\bar{\omega}\lambda } = 
+	\mat{-c \\ -\bar{\lambda}b - \mu - \bar{\lambda \omega}} 
+	\]
+
+
+	\[ 
+	\mat{Qx & -A^T \bar{\lambda} \dd \lambda& \\ -\bar{\lambda}Ax & -\bar{\omega \lambda} \dd \lambda } = 
+	\mat{-c \\ -\bar{\lambda}b - \mu - \bar{\lambda \omega}} 
+	\]
+
+** Symmetric $m$
+
+	 \[ -\lambda = \frac{1}{\bar{\omega} } \block{ \bar{\lambda}\block{A x - b} - \mu } - \bar{\lambda} \]
+
+	 Let $\eta = \frac{ \bar{\lambda} } {\bar{\omega} }$
+
+	 \[ \block{Q + A^T \eta A} x = -c + A^T \block{ \eta b + \bar{\lambda} + \frac{\mu}{\bar{\omega} } } \]
+	 

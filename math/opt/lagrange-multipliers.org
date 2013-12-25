@@ -1,0 +1,103 @@
+Multiplicateurs de Lagrange
+
+#+include: ~/org/latex.org
+#+setupfile: ~/org/style.org
+
+On note $E = \RR^m$ et $F = \RR^n$ pour $m, n \in \NN$ avec $n \leq
+m$. On cherche à optimiser une fonction $f \in C^1 (E, \mathbb{R})$
+sous $m$ contraintes /holonomes/ $c \in C^1 (E, F)$, c'est-à-dire
+qu'on cherche des valeurs extrêmales de la fonction $f$ restreinte à
+l'ensemble des points vérifiant $c(x) = 0$.
+
+
+ 
+* Énoncé
+
+  Le théorème des *extrêma liés* établit une condition /nécéssaire/
+  d'optimalité: si $x^\star$ est un point critique pour $f_{|C}$,
+  alors la différentielle de $f$ en $x^\star$ est combinaison linéaire
+  des différentielles des contraintes $c_i$ :
+
+  \[ \dd f(x^\star) \in \Span{ \dd c_i(x^\star) } \]
+  
+  Pour une unique contrainte, cela se traduit par deux gradients
+  /colinéaires/, ce qu'exprime le nom du théorème. On s'en sert pour
+  trouver des candidats possibles au titre d'extrêmum. On suppose en
+  outre que les domaines de définition sont ouverts (et
+  non-disjoints): le théorème ne dit donc rien sur ce qui peut se
+  passer aux bords.
+
+  On a une assez bonne *intuition* du théorème en considérant un
+  pendule soumis à la gravité: les extrema de l'énergie potentielle se
+  produisent lorsque son gradient /(la force de gravité)/ et celui des
+  contraintes /(le fil du pendule)/ sont alignés. On peut également
+  résumer en disant qu'à l'optimium, le gradient est (localement)
+  orthogonal aux contraintes.
+  
+
+* Preuve
+  
+  Soit $C = c^{-1}(0)$. Puisque $c$ est constante sur $C$ , tout
+  vecteur tangent à $C$ en $x \in C$ est dans le noyau de $\dd c(x)$:
+  soit $v \in T_xE$. $v \in T_xC \iff \dd c(x).v = 0$. La stationnarité
+  de $f$ en $x$ peut alors s'exprimer de la manière suivante:
+  
+  \[ v \in T_x C \Rightarrow \dd f(x).v = 0 \]
+  \[ \dd c(x).v = 0 \Rightarrow \dd f(x).v = 0 \]
+  \[ v \in \Ker{\dd c(x)} \Rightarrow v \in \Ker{\dd f(x)} \]
+
+  Finalement:
+
+  \[ \Ker{\dd c(x)} \subset \Ker{\dd f(x)} \]
+  
+  Ceci implique que $\dd f(x)$ est combinaison linéaire des $\dd c_i(x)$. En
+  effet, les $\dd c_i(x)$ étant libres, on prend leur famille /duale/ [fn:famille-duale]
+  $(g_i)_{i \leq m}$, puis l'on forme pour tout $v \in T_xC$ le
+  vecteur $y \in T_x C$ défini par:
+  
+  \[ y(v) = v - \sum_{i = 1}^{i = m}(\dd c_i(x).v).g_i \]
+  
+  On vérifie que $y \in \underset{i}{\bigcap} Ker(\dd c_i(x))$ donc que
+  $y(v) \in Ker( \dd f(x) )$ pour tout $v \in T_x C$. En d'autres termes,
+  $\dd f(x)$ s'écrit:
+  
+  \[ \dd f(x).v = \sum_{i = 1}^{i = m}(\dd c_i(x).v) (\dd f(x).g_i) \]
+  
+  Ou, plus simplement:
+  
+  \[ \dd f(x) = \sum_{i = 1}^{i = m}(\dd f(x).g_i) \  \dd c_i(x) \]
+  
+  
+* Lagrangien 
+  :PROPERTIES:
+  :CUSTOM_ID: muchel
+  :END:
+
+  Le théorème affirme donc l'existence de $m$ scalaires
+  $(\lambda_i)_{i \leq m}$ appelés *multiplicateurs de Lagrange*,
+  tels que:
+  
+  \[ \dd f(x) = \sum_{i=1}^{i=m} \lambda_i.\dd c_i(x) \]
+  
+  ...dont la valeur est donnée dans la preuve. En pratique, on pourra
+  se ramener à l'étude équivalente des points critiques du
+  *Lagrangien*:
+  
+  \[ L(x, \lambda) = f(x) + \lambda^T c(x) \] 
+  
+  En effet, un point critique de $L$ vérifie:
+  
+  \[ dL = 0 \iff \cases { \frac{\partial L}{\partial x} = 0 \cr
+  \frac{\partial L}{\partial x} = 0 } \]
+  
+  Avec:
+
+  \[ \frac{\partial L}{\partial x} \dd x = \dd f(x).\dd x + \lambda^T \dd c(x).\dd x \]
+  \[ \frac{\partial L}{\partial \lambda} \dd \lambda = c(x)^T \dd \lambda \]
+
+  Un point critique du Lagrangien vérifie donc exactement les
+  conditions d'optimalité recherchées pour $f$.
+  
+  
+* Footnotes
+[fn:famille-duale] /i.e./ telle que $\dd c_i(x).g_j = \delta_{i,j}$

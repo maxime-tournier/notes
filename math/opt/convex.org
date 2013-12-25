@@ -1,0 +1,27 @@
+Convex Optimization
+
+#+include: ~/org/latex.org
+#+setupfile: ~/org/style.org
+
+* Convexity
+
+** TODO Convex Set
+
+** TODO Convex Function
+	 
+** TODO Jensen Inequality
+	 
+* KKT conditions
+
+** TODO Farkas' Lemma
+
+* Lagrangian duality
+
+** Dual problem
+
+** Duality gap
+
+** Weak duality
+
+** Strong duality
+

@@ -1,0 +1,53 @@
+Modulus Algorithm
+
+A nice and clean QP solver. The LCP version is due to Van Bokhoven.
+
+#+include: ~/org/latex.org
+#+setupfile: ~/org/style.org
+
+* Modulus Transformation
+
+If $\compl{\lambda}{w}$ are two complementary variables, it is
+convenient to express them as the /positive/ and /negative/ part of a
+/single/ variable $z$:
+
+\begin{align}
+\lambda &= |z| - z \\
+w &= |z| + z \\
+\end{align}
+
+* Fixed-Point LCP Solver
+
+Applying the above change of variable to the LCP $(M, q)$ gives:
+
+\[ M(|z| - z) + q = |z| + z \]
+
+Sorting $z$ and $|z|$:
+
+\[ (I + M) z = q - (I - M)|z| \]
+
+We finally obtain the following fixed-point equation (due to Van
+Bokhoven):
+
+\[\ z = \inv{(I + M)}\block{q - (I - M)|z|} \]
+
+When $M$ is PSD, the convergence is easily proved by looking at the
+eigenvalues of the following operator:
+
+\[ Cay(M) = \inv{(I + M)}(I - M) \]
+
+which allows the Banach contraction mapping theorem to kick in.
+
+* TODO QP Solver
+
+Letting the damping parameter $0 \leq \epsilon < 1$ and $\eta =
+\frac{1}{1 - \epsilon}$, the KKT system can be written as:
+
+\[ \mat{ Q - \eta J^T J  & \eta J^T \\ 
+         \eta J & - \eta I + P_z^- } \mat{v \\ z} = \mat{-c - \eta J^T b \\ \eta b }
+\]
+
+where $P_z^-$ filters (/i.e./ zeroes) positive entries in $z$. 
+
+Solving the above (linearized) fixed point can be seen as an
+active-sets non-smooth Newton solver.

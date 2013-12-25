@@ -1,0 +1,123 @@
+Cholesky Decomposition
+ 
+#+setupfile: ~/org/style.org
+#+include: ~/org/latex.org
+
+* TODO 
+
+  - complete the theory part
+
+* TODO Theory
+
+Most symmetric matrices $H$ have a factorization of the form:
+
+\[ H = L D L^T \]
+
+where $L$ is /lower/-triangular with unit diagonal elements, and $D$
+is diagonal and positive.
+  
+* Algorithm
+
+The following algorithm computes the Cholesky decomposition of a
+matrix $H$ /in-place/, using the diagonal blocks to store $D$. See
+[[http://en.wikipedia.org/wiki/Cholesky_decomposition#Avoiding_taking_square_roots][Wikipedia]] for more details. Note that the algorithm presented here
+works on the /upper/ diagonal of the original matrix.
+
+** Factor
+
+@<div class="algorithm">
+ - for $i = 0$ to $n$ 
+    - for $k = i − 1$ to $1$  /$k \in$ processed/
+      - $H_{ii} := H_{ii} -  H_{ki}^T H_{kk} H_{ki}$
+    - for $j = i + 1$ to $n$  /$j \in$ remaining/
+      - for $k = i − 1$ to $1$ /$k \in$ processed/ 
+	- $H_{ij} := H_{ij} - H_{ki}^T H_{kk} H_{kj}$ /fill-in !/
+      - $H_{ij} := \inv{H_{ii}} H_{ij}$
+@</div> 
+
+** Solve
+
+We solve the system $Hx = z$ using the following algorithm:
+
+@<div class="algorithm">
+   - for $i = 1$ to $n$
+     - $x_i := z_i$
+     - for $j = 1$ to $i − 1$  /$j \in$ processed/
+       - $x_i := x_i – H_{ij}^T x_j$
+   - for $i = n$ to $1$ 
+       - $x_i := \inv{H_{ii}} x_i$
+     - for $j = i + 1$ to $n$ /$j \in$ processed/
+       - $x_i := x_i – H_{ij} x_j$
+@</div> 
+ 
+
+* Sparse Algorithm
+
+When a lot of matrix blocks are zero in $H$, the algorithm may be
+simplified based on an undirected /adjacency graph/ structure, where
+an edge $(i, j)$ indicates a non-zero matrix block between coordinates
+$i$ and $j$.
+
+A postfix /depth-first/ traversal of the graph allows one to number
+and order the graph as a /direct acyclic graph/ (DAG). In such
+numbering, every vertex has an index greater than all its predecessors
+according to the topological sort.
+
+With this convention, processing nodes by /increasing/ indices
+corresponds to a *postfix* (/i.e/ children first) depth-first
+traversal, while processing nodes by /decreasing/ indices corresponds to
+a *prefix* traversal (parents first).
+
+** Factor
+
+@<div class="algorithm">
+  - for each vertex $i$ in *postfix* order
+    - for each *child* vertex $k$ of $i$ /otherwise $H_{ki}$ is zero/
+      - $H_{ii} := H_{ii} -  H_{ki}^T H_{kk} H_{ki}$  
+    - for each *remaining* vertex $j$
+      - for each *common* child $k$ of $i$ and $j$  /otherwise either $H_{ki}$ or $H_{kj}$ is zero/
+	- $H_{ij} := H_{ij} - H_{ki}^T H_{kk} H_{kj}$ /may add a new edge !/
+    - for each *parent* vertex $j$ of $i$ /otherwise $H_{ij}$ is zero/
+      - $H_{ij} := \inv{H_{ii}} H_{ij}$
+@</div> 
+
+On fill-in between $i$ and $j$, the added edge is oriented such that
+$i$ becomes a new child of $j$, which does not alter the topological
+ordering.
+
+** Solve
+
+@<div class="algorithm">
+   - for each vertex $i$ in *postfix* order
+     - $x_i := z_i$
+     - for each *child* vertex $j$ of $i$
+       - $x_i := x_i – H_{ij}^T x_j$
+   - for each vertex $i$ in *prefix* order
+       - $x_i := \inv{H_{ii}} x_i$
+     - for each *parent* vertex $j$ of $i$
+       - $x_i := x_i – H_{ij} x_j$
+@</div> 
+
+* Acyclic Graph, Fill-in
+ 
+We see that when the DAG is a /tree/, there is never any common child
+between two vertices. Therefore, no fill-in can happen, and the factor
+algorithm reduces to:
+
+@<div class="algorithm">
+  - for each vertex $i$ in *postfix* order
+    - for each *child* vertex $k$ of $i$  
+      - $H_{ii} := H_{ii} -  H_{ki}^T H_{kk} H_{ki}$  
+    - for *the* parent vertex $j$ of $i$, if any:
+      - $H_{ij} := \inv{H_{ii}} H_{ij}$
+@</div> 
+    
+
+It can be useful to perform an /incomplete/ factorization by
+preventing off-diagonal fill-in. The associated /solve/ algorithm can
+act as a /preconditioner/ for iterative methods.
+   
+
+* Applications
+
+See [[../phys/constraint-graphs.org][Constraint Graphs]].
