@@ -2,7 +2,7 @@
 # this is meant to be run from within emacs (with server started)
 first: publish
 
-org-publish: toc
+org-publish: 
 	emacsclient -eval '(org-publish-all)'
 
 publish: org-publish
