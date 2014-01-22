@@ -2,9 +2,9 @@
 
 Rigid Bodies
 
-Some quick notes about physical properties of rigid bodies. Make sure
-you feel comfortable with the geometry of $SE(3)$ first, otherwise
-have a look [[../math/group/se3.org][here]].
+Some quick notes about the physical properties of rigid bodies. Make
+sure you feel comfortable with the geometry of $SE(3)$ first,
+otherwise you probably want to read [[../math/group/se3.org][this]] first.
 
 * TODO Configuration Space
   
@@ -16,32 +16,32 @@ have a look [[../math/group/se3.org][here]].
   point of the object. In other words:
   
   \begin{align}
-  T(\omega, v) &= \int_O \rho(x) \half \norm{v + \omega \times x}^2 \dd x \\
+  T(\omega, v) &= \int_\Omega \rho(x) \half \norm{v + \omega \times x}^2 \dd x \\
   &= 
-  \half \norm{v}^2 \int_O \rho(x) \dd x \quad -
-  \quad v^T \block{\int_O \rho(x) \hat{x} \dd x} \omega \quad +
-  \quad \half \omega^T \block{\int_O \rho(x) \hat{x}^T\hat{x} \dd x} \omega \\
+  \half \norm{v}^2 \int_\Omega \rho(x) \dd x \quad -
+  \quad v^T \block{\int_\Omega \rho(x) \hat{x} \dd x} \omega \quad +
+  \quad \half \omega^T \block{\int_\Omega \rho(x) \hat{x}^T\hat{x} \dd x} \omega \\
   &= 
-  \half m \norm{v} \quad + \quad m v^T c \times \omega \quad + \quad \half \omega^T I \omega
+  \half m \norm{v}^2 \quad - \quad m v^T c \times \omega \quad + \quad \half \omega^T I \omega
   \end{align}
 
   where $\rho(x)$ is the mass density function, its integral $m$ is
   the total mass of the object, $\mathcal{I}$ is the (rotational) body-fixed
   inertia tensor, defined as:
   
-  \[ \mathcal{I} = \int_O \rho(x) \hat{x}^T \hat{x} \dd x \]
+  \[ \mathcal{I} = \int_\Omega \rho(x) \hat{x}^T \hat{x} \dd x \]
   
   and $c$ is the center of gravity in body coordinates:
   
-  \[ c = \frac{1}{m} \int_O \rho(x) x \dd x \]
+  \[ c = \frac{1}{m} \int_\Omega \rho(x) x \dd x \]
   
   If we set the body coordinate frame at the center of gravity, the
   expression above conveniently simplifies to:
   
   \[ T(\omega, v) = \half m \norm{v}^2 + \half \omega^T \mathcal{I} \omega \]
   
-  The above gives a definition of the rigid body-fixed inertia tensor
-  as:
+  We finally obtain a definition of the rigid body-fixed inertia
+  tensor as:
   
   \[ M = \mat{\mathcal{I} & 0\\ 0 & m} \]
   
@@ -49,3 +49,61 @@ have a look [[../math/group/se3.org][here]].
   
   \[T(\omega, v) = \half (\omega, v)^T M (\omega, v) \]
   
+  If we did not choose the origin to be the center of mass, then some
+  crossed-terms would appear in the inertia tensor. Instead, placing
+  the origin at the center of mass decouples the translational and
+  rotational metrics.
+  
+** Canonical Reference Frame
+
+  We just saw that choosing the reference frame at the center of mass
+  simplifies computations and inertia tensors, but we can go a bit
+  further.
+  
+  As a positive semi-definite matrix, the inertia tensor $\mathcal{I}$
+  may be diagonalized in an orthogonal basis $R \in SO(3)$, so we may
+  choose a /canonical/ reference frame where the axes are aligned with
+  the principal axes of the inertia tensor. This way, we obtain a
+  /diagonal/ rigid body-fixed inertia tensor.
+
+
+* Momentum
+
+  From the kinetic energy expression above, the (body-fixed) momentum
+  of the rigid-body is defined as the following covector:
+
+  \begin{align}
+  p &= \ddd{\LL}{ (\omega, v) } \\ 
+  \end{align}
+
+  The rigid momentum is usually divided into its /linear/ and
+  /angular/ parts. The /linear/ momentum is equal to the momentum of a
+  single particle located at the center of mass of the object,
+  concentrating all the mass. If we step back for  one second and forget
+  about the particular expression obtained when the origin is a the
+  center of mass, the /angular/ momentum can be computed in general as
+  follows:
+  
+  \[ 
+  \ddd{\LL}{\omega} = -\int_\Omega \rho(x)  \block{v - x \times \omega}^T \hat{x} \dd x 
+  \]
+
+  That is, if we transpose everything to obtain a /vector/:
+  
+  \[ \nabla_\omega \LL = \int_\Omega \rho(x) x \times \block{ v + \omega \times x} \dd x \]
+  
+  We obtain the sum of each of the particle momenta, pulled by the
+  rigid mapping, in body-fixed coordinates. Here, the velocity and
+  momentum field are rigid, but this can be used to obtain the general
+  classical definition of the angular momentum for a collection of
+  particles:
+  
+  The angular momentum of a collection of particles about a point $r$
+  is the net spatial angular momentum pulled on a rigid body located
+  at $r$, considering that each particle is rigidly attached to the
+  rigid body.
+
+
+* TODO Newton-Euler Equations
+
+  Body-fixed, spatial, and in-between:

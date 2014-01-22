@@ -24,16 +24,21 @@ for more details.
 
 ** Rigid Bodies
 
-   In the case of rigid bodies, the momentum is usually split between
+   In the case of [[./rigid.org][rigid]] bodies, the momentum is usually split between
    linear and angular parts. The /classical/ definition of angular
    momentum about a point $r$ is:
 
-   \[ L(r) = \int_O \rho(x) (x - r) \times v(x) \ \dd x \]
+   \[ L(r) = \int_\Omega \rho(x) (x - r) \times v(x) \ \dd x \]
 
-   In other words, the angular momentum (continuously) aggregates the
-   momentum due to each particle in the object, in a "torque"
-   fashion. Introducing the center of mass $c$ can help obtaining a
-   more systematic expression:
+   In body-fixed coordinates, this reads:
+
+   \[ L(r) = \int_\Omega \rho(x) \block{x - R^T (r - c)} \times \block{v + \omega \times x} \dd x\]
+
+   Put roughly, the angular momentum (continuously) aggregates the
+   momentum due to each particle in the object, pulled according to
+   the rigid-point mapping. More precisely:
+
+   \[ L(r) = \int_\Omega \rho(x) (x - c) \times v(x) \]
 
    
 
