@@ -1,0 +1,51 @@
+#+include: ~/org/latex.org
+
+Rigid Bodies
+
+Some quick notes about physical properties of rigid bodies. Make sure
+you feel comfortable with the geometry of $SE(3)$ first, otherwise
+have a look [[../math/group/se3.org][here]].
+
+* TODO Configuration Space
+  
+* Inertia Tensor
+  
+  The kinetic energy of a solid, rigid or not, is the (continuous) sum
+  of the kinetic energies of each of its particles, where a /mass
+  density/ function $\rho(x)$ is used to indicate the mass of each
+  point of the object. In other words:
+  
+  \begin{align}
+  T(\omega, v) &= \int_O \rho(x) \half \norm{v + \omega \times x}^2 \dd x \\
+  &= 
+  \half \norm{v}^2 \int_O \rho(x) \dd x \quad -
+  \quad v^T \block{\int_O \rho(x) \hat{x} \dd x} \omega \quad +
+  \quad \half \omega^T \block{\int_O \rho(x) \hat{x}^T\hat{x} \dd x} \omega \\
+  &= 
+  \half m \norm{v} \quad + \quad m v^T c \times \omega \quad + \quad \half \omega^T I \omega
+  \end{align}
+
+  where $\rho(x)$ is the mass density function, its integral $m$ is
+  the total mass of the object, $\mathcal{I}$ is the (rotational) body-fixed
+  inertia tensor, defined as:
+  
+  \[ \mathcal{I} = \int_O \rho(x) \hat{x}^T \hat{x} \dd x \]
+  
+  and $c$ is the center of gravity in body coordinates:
+  
+  \[ c = \frac{1}{m} \int_O \rho(x) x \dd x \]
+  
+  If we set the body coordinate frame at the center of gravity, the
+  expression above conveniently simplifies to:
+  
+  \[ T(\omega, v) = \half m \norm{v}^2 + \half \omega^T \mathcal{I} \omega \]
+  
+  The above gives a definition of the rigid body-fixed inertia tensor
+  as:
+  
+  \[ M = \mat{\mathcal{I} & 0\\ 0 & m} \]
+  
+  so that:
+  
+  \[T(\omega, v) = \half (\omega, v)^T M (\omega, v) \]
+  

@@ -1,0 +1,44 @@
+#+include: ~/org/latex.org
+
+Momentum
+
+Some notes about momentum, and particularly angular momentum.
+
+* Definition
+
+In the broad sense, momentum is /only/ defined as the partial
+derivative of the Lagrangian with respect to velocity:
+
+\[ p = \ddd{\LL}{v}(q, v) \]
+
+In fact, only the /kinectic energy/ $T = \half v^T M v$ actually plays
+a role in it, where $M(q)$ is the inertia at current
+configuration. Thus, the general expression of momentum is:
+
+\[ p = M v \]
+
+Note that $p, v$ and $M$ depend on the choice of
+coordinate-frame. There can be a body-fixed, or spatial momentum, or
+even using some other coordinate frame. See the notes on [[../math/group/lie-groups.org][Lie groups]]
+for more details.
+
+** Rigid Bodies
+
+   In the case of rigid bodies, the momentum is usually split between
+   linear and angular parts. The /classical/ definition of angular
+   momentum about a point $r$ is:
+
+   \[ L(r) = \int_O \rho(x) (x - r) \times v(x) \ \dd x \]
+
+   In other words, the angular momentum (continuously) aggregates the
+   momentum due to each particle in the object, in a "torque"
+   fashion. Introducing the center of mass $c$ can help obtaining a
+   more systematic expression:
+
+   
+
+
+** Usual angular momentum definition
+   
+
+
