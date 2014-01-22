@@ -1,7 +1,6 @@
 Convex Optimization
 
 #+include: ~/org/latex.org
-#+setupfile: ~/org/style.org
 
 * Convexity
 

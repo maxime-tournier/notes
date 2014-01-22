@@ -1,6 +1,5 @@
 Projection Orthogonale
 
-#+setupfile: ~/org/style.org
 #+include: ~/org/latex.org
 
 Une fois établie l'existence d'un supplémentaire orthogonal pour tout

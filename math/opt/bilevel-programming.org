@@ -1,7 +1,6 @@
 Bilevel Programming
 
 #+include ~/org/latex.org
-#+setupfile: ~/org/style.org
   
 We consider the following control problem:
 

@@ -1,6 +1,5 @@
 Cholesky Decomposition
  
-#+setupfile: ~/org/style.org
 #+include: ~/org/latex.org
 
 * TODO 

@@ -3,10 +3,7 @@ Lie Groups
 These are notes on the wonderful (here basic) Lie group theory. Some
 familiarity with [[TODO][differentiable manifolds]] is assumed.
 
-#+setupfile: ~/org/style.org
 #+include: ~/org/latex.org
-
-
 
 * Definition 
 

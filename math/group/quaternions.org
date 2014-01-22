@@ -8,7 +8,6 @@ rotations can be expressed by means of quaternion representation,
 which often gives a much more intuitive view of the situation.
 
 #+include: ~/org/latex.org
-#+setupfile: ~/org/style.org
 
 * Construction
 

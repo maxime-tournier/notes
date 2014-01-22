@@ -9,7 +9,7 @@ body {
 
 	font-family: Palatino, Georgia, Serif;
 	line-height: 142%;
-	/* text-align: justify; */
+	text-align: justify;
 	
 }
 
@@ -17,4 +17,35 @@ a:link {
 	color: #24a;
 	text-decoration: none;
 	font-weight: bold;
+}
+
+h1 ~ div.MathJax_Display {
+	display:none;
+}
+
+span.section-number-2:after {
+	content: ".";
+}
+
+h1 {
+	margin: 1em 0;
+}
+
+h2 {
+	margin: 2em 1em 0 0;
+}
+
+h3 {
+	margin: 2em 1em 0 0;
+}
+
+#postamble {
+	font-size: 80%;
+	text-align:center;
+	margin: 2em 1em 0 0;
+}
+
+#postamble p {
+	display:inline;
+	padding: 0 0.5em;
 }

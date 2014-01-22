@@ -1,6 +1,5 @@
 Krylov Methods
 
-#+setupfile: ~/org/style.org
 #+include: ~/org/latex.org
 
 * Krylov Space

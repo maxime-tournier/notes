@@ -4,7 +4,6 @@ Some notes on the (3-dimensional) special linear group (especially for
 computing exponential/logarithm)
 
 #+include: ~/org/latex.org
-#+setupfile: ~/org/style.org
 
 * Definition
 

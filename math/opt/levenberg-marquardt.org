@@ -1,7 +1,6 @@
 Levenberg-Marquardt Algorithm
 
 #+include: ~/org/latex.org
-#+setupfile: ~/org/style.org
 
 The Levenberg-Marquardt algorithm is a popular non-linear
 least-squares algorithm based on a damped Gauss-Newton approach. Since

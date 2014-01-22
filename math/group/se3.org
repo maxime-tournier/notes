@@ -1,3 +1,5 @@
+#+include: ~/org/latex.org
+
 Special Euclidean Group
  
 The Special Euclidean Group, noted $SE(n)$, is the group of affine
@@ -5,8 +7,6 @@ maps that preserve the Euclidean metric and orientation in a
 $n$-dimensional Euclidean space. Usually we are interested in its
 3-dimensional realization, $SE(3)$, whose study forms the basis of
 rigid body kinematics.
-
-#+include: ~/org/latex.org
 
 * Definition
    
@@ -191,3 +191,4 @@ All in all, body-fixed quantities are much easier to work with.
  
  
  
+

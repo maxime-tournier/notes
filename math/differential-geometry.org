@@ -1,6 +1,5 @@
 Differential Geometry
 
-#+setupfile: ~/org/style.org
 #+include: ~/org/latex.org
 
 * TODO Manifolds

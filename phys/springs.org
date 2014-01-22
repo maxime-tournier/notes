@@ -1,6 +1,5 @@
 Springs !
 
-#+setupfile: ~/org/style.org
 #+include: ~/org/latex.org
 
 Soit la fonction $f(x) = \norm{x - y} - l$ et soit $g(x) = \half

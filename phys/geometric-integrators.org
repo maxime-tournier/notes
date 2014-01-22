@@ -23,7 +23,6 @@ a symplectic integrator.
 This document provides some (hopefully exact) details on the
 derivations. 
    
-#+setupfile: ~/org/style.org
 #+include: ~/org/latex.org
        
 * Variational Formulation

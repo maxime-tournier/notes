@@ -8,7 +8,6 @@ uses the Lie group and algebra geometry.
 
 We give experimental results, compare to matlab, and so on.
 
-#+setupfile: ~/org/style.org
 #+include: ~/org/latex.org
 
 

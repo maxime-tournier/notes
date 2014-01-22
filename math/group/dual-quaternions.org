@@ -5,7 +5,6 @@ Just when you thought usual [[file:quaternions.org][quaternions]] were easy to g
 transformations]] pretty much the same way usual quaternion represent
 rotations. Most of these developments are taken from [fn:kavan].
 
-#+setupfile: ~/org/style.org
 #+include: ~/org/latex.org
 
 * Definition

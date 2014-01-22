@@ -1,7 +1,6 @@
 Multiplicateurs de Lagrange
 
 #+include: ~/org/latex.org
-#+setupfile: ~/org/style.org
 
 On note $E = \RR^m$ et $F = \RR^n$ pour $m, n \in \NN$ avec $n \leq
 m$. On cherche à optimiser une fonction $f \in C^1 (E, \mathbb{R})$

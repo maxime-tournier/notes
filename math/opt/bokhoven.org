@@ -3,7 +3,6 @@ Modulus Algorithm
 A nice and clean QP solver. The LCP version is due to Van Bokhoven.
 
 #+include: ~/org/latex.org
-#+setupfile: ~/org/style.org
 
 * Modulus Transformation
 

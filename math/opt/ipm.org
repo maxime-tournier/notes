@@ -1,6 +1,5 @@
 Interior Point Method
 
-#+setupfile: ~/org/style.org
 #+include: ~/org/latex.org
 
 

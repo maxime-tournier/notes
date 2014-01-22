@@ -2,7 +2,6 @@ Constraint Graphs
 
 
 #+include: ~/org/latex.org 
-#+setupfile: ~/org/style.org
 
 It is probably a good idea to have a look at [[../math/cholesky.org][Cholesky]] first.
 
