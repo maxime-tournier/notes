@@ -5,45 +5,71 @@ Momentum
 Some notes about momentum, and particularly angular momentum.
 
 * Definition
-
-In the broad sense, momentum is /only/ defined as the partial
-derivative of the Lagrangian with respect to velocity:
-
-\[ p = \ddd{\LL}{v}(q, v) \]
-
-In fact, only the /kinectic energy/ $T = \half v^T M v$ actually plays
-a role in it, where $M(q)$ is the inertia at current
-configuration. Thus, the general expression of momentum is:
-
-\[ p = M v \]
-
-Note that $p, v$ and $M$ depend on the choice of
-coordinate-frame. There can be a body-fixed, or spatial momentum, or
-even using some other coordinate frame. See the notes on [[../math/group/lie-groups.org][Lie groups]]
-for more details.
-
-** Rigid Bodies
-
-   In the case of [[./rigid.org][rigid]] bodies, the momentum is usually split between
-   linear and angular parts. The /classical/ definition of angular
-   momentum about a point $r$ is:
-
-   \[ L(r) = \int_\Omega \rho(x) (x - r) \times v(x) \ \dd x \]
-
-   In body-fixed coordinates, this reads:
-
-   \[ L(r) = \int_\Omega \rho(x) \block{x - R^T (r - c)} \times \block{v + \omega \times x} \dd x\]
-
-   Put roughly, the angular momentum (continuously) aggregates the
-   momentum due to each particle in the object, pulled according to
-   the rigid-point mapping. More precisely:
-
-   \[ L(r) = \int_\Omega \rho(x) (x - c) \times v(x) \]
-
-   
-
-
-** Usual angular momentum definition
-   
-
-
+  
+  In the broad sense, momentum is /only/ defined as the partial
+  derivative of the Lagrangian with respect to velocity:
+  
+  \[ p = \ddd{\LL}{v}(q, v) \]
+  
+  In fact, only the /kinectic energy/ $T = \half v^T M v$ actually plays
+  a role in it, where $M(q)$ is the inertia at current
+  configuration. Thus, the general expression of momentum is:
+  
+  \[ p = M v \]
+  
+  Note that $p, v$ and $M$ depend on the choice of
+  coordinate-frame. There can be a body-fixed, or spatial momentum, or
+  even using some other coordinate frame. See the notes on [[../math/group/lie-groups.org][Lie groups]]
+  for more details.
+  
+* Angular Momentum
+  
+  The angular momentum of a physical system $\Omega$ about a point $r
+  \in \RR^3$ quantifies how much rotational momentum around $r$
+  (/e.g./ a $SO(3)$ cotangent vector) is induced by all the particles
+  composing the system. It is usually difficult to figure out where
+  does the classical formula come from, so here is formal derivation.
+  
+  In order to compute this angular momentum, we add an additional
+  virtual, *zero velocity* degree of freedom to the system $g \in
+  SO(3)$ to the system, with rotation center at $r$, and see how much
+  angular momentum the system pulls on it. More precisely, letting the
+  displacement field of the system be given as:
+  
+  \[ f: Q \times X \to \RR^3 \]
+  
+  where $Q$ are the kinematic DOFs and $X$ is the reference
+  configuration, we form the modified displacement field using the
+  additional rotation DOFs:
+  
+  \[ \tilde{f}: SO(3) \times Q \times X \to \RR^3 \]
+  
+  \[ \tilde{f}(g, q, x) = r + g \block{ f(q, x) - r } \]
+  
+  We could set anything for $g$, as we are only interested in the
+  spatial angular momentum. We will compute the momentum for $g = Id$
+  and $\dd g = 0$. The kinetic energy is:
+  
+  \[ T = \half \int_X \rho(x) \norm{\dd \tilde{f}(g, q, x) (\dd g, \dd q)}^2 \dd x \]
+  
+  Deriving the full inertia tensor would be tedious, especially
+  since we are only interested in the first-order terms in $\dd g$ in
+  the squared norm above, as only them will be left when we finally
+  set $\dd g = 0$ to obtain the angular momentum. That is, as a
+  covector:
+  
+  \[ \mu = -\int_X \rho(x) \dd f^T \hat{f - r} \ \dd x \]
+  
+  Or, as a vector:
+  
+  \[ \mu^T = \int_X \rho(x) \block{f - r} \times \dd f \ \dd x \]
+  
+  Thus, the angular momentum of the system is obtained as the sum of
+  each angular momenta, pulled on $g$ through the rotational mapping
+  around $r$, which sounds quite reasonable. In other words:
+  
+  \[ L(r, q, v) = \int_X \rho(x) \block{f(q, x) - r} \times \ddd{f}{q}(q, x) v \ \dd x \]
+  
+  
+  
+  

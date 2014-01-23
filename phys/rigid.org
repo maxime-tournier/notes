@@ -79,30 +79,9 @@ otherwise you probably want to read [[../math/group/se3.org][this]] first.
   The rigid momentum is usually divided into its /linear/ and
   /angular/ parts. The /linear/ momentum is equal to the momentum of a
   single particle located at the center of mass of the object,
-  concentrating all the mass. If we step back for  one second and forget
-  about the particular expression obtained when the origin is a the
-  center of mass, the /angular/ momentum can be computed in general as
-  follows:
-  
-  \[ 
-  \ddd{\LL}{\omega} = -\int_\Omega \rho(x)  \block{v - x \times \omega}^T \hat{x} \dd x 
-  \]
-
-  That is, if we transpose everything to obtain a /vector/:
-  
-  \[ \nabla_\omega \LL = \int_\Omega \rho(x) x \times \block{ v + \omega \times x} \dd x \]
-  
-  We obtain the sum of each of the particle momenta, pulled by the
-  rigid mapping, in body-fixed coordinates. Here, the velocity and
-  momentum field are rigid, but this can be used to obtain the general
-  classical definition of the angular momentum for a collection of
-  particles:
-  
-  The angular momentum of a collection of particles about a point $r$
-  is the net spatial angular momentum pulled on a rigid body located
-  at $r$, considering that each particle is rigidly attached to the
-  rigid body.
-
+  concentrating all the mass. The angular part aggregates each
+  particle momentum pulled on the rotational DOFs through the rotation
+  mapping.
 
 * TODO Newton-Euler Equations
 
